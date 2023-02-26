@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Find My Tutor</string>
+    <string name="Search">Search</string>
+    <string name="Chat">Chat</string>
+    <string name="Favourites">Favourites</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="Availability">Availability</string>
+    <string name="Available" >Available</string>
+    <string name="Tentative" >Tentative</string>
+    <string name="Busy" >Busy</string>
+</resources>

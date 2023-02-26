@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "173266073992",
+    "project_id": "mobile-applications-78f0c",
+    "storage_bucket": "mobile-applications-78f0c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:173266073992:android:90051e478a4fd8d449e23d",
+        "android_client_info": {
+          "package_name": "com.example.findmytutor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "173266073992-tse575p7gr4ok03ecfnj1rqdgcj5nueq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDV3N8Ax-crgYcmzURh0vl9c0aiK3v66BQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "173266073992-tse575p7gr4ok03ecfnj1rqdgcj5nueq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
