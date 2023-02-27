@@ -43,7 +43,7 @@
                 android:value="" />
             <meta-data
                 android:name="com.bumptech.glide.module.AppGlideModule"
-                android:value="com.example.findmytutor.ListAdapters.MyAppGlideModule" />
+                android:value="com.example.findmytutor.MyAppGlideModule" />
 
         </activity>
     </application>

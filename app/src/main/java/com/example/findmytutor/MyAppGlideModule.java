@@ -1,4 +1,4 @@
-package com.example.findmytutor.ListAdapters;
+package com.example.findmytutor;
 
 import android.content.Context;
 
