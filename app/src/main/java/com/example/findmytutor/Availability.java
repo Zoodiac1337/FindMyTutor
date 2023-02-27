@@ -1,27 +1,41 @@
 package com.example.findmytutor;
 
+import static android.app.Activity.RESULT_OK;
+
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.bumptech.glide.signature.ObjectKey;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -46,6 +60,7 @@ public class Availability extends Fragment {
     private String mParam2;
     private String Availability = "Available";
     private String Email;
+    public static final int PICK_IMAGE = 1;
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -91,13 +106,15 @@ public class Availability extends Fragment {
         EditText description = (EditText) view.findViewById(R.id.editTextDescription);
         EditText location = (EditText) view.findViewById(R.id.editTextLocation);
         EditText time = (EditText) view.findViewById(R.id.editTextEndAfter);
+        ImageView imageUpload = (ImageView) view.findViewById(R.id.imageViewAvatar);
 
         LinearLayout locationLayout = (LinearLayout) view.findViewById(R.id.locationLayout);
         LinearLayout timeLayout = (LinearLayout) view.findViewById(R.id.timeLayout);
         BottomNavigationView bottomNavigationView = (BottomNavigationView) view.findViewById(R.id.availability_navigation);
         Email = bundle.getString("email");
 
-
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Avatars/"+Email+".jpg");
+        GlideApp.with(getActivity()).load(storageReference).signature(new ObjectKey(storageReference.getMetadata())).placeholder(R.drawable.baseline_perm_contact_calendar_24).into(imageUpload);
 
         bottomNavigationView.setOnItemSelectedListener(
                 new NavigationBarView.OnItemSelectedListener() {
@@ -147,8 +164,8 @@ public class Availability extends Fragment {
             }
         });
 
-        Button button = (Button) view.findViewById(R.id.saveButton);
-        button.setOnClickListener(new View.OnClickListener()
+        Button buttonSave = (Button) view.findViewById(R.id.saveButton);
+        buttonSave.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -192,7 +209,64 @@ public class Availability extends Fragment {
                 }
             }
         });
+
+
+        imageUpload.setOnClickListener(new View.OnClickListener()
+        {
+            //got from https://stackoverflow.com/questions/5309190/android-pick-images-from-gallery
+            @Override
+            public void onClick(View v)
+            {
+//                Intent intent = new Intent();
+//                intent.setType("image/*");
+//                intent.setAction(Intent.ACTION_GET_CONTENT);
+//                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
+
+                Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                getIntent.setType("image/*");
+
+                Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                pickIntent.setType("image/*");
+
+                Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
+                chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {pickIntent});
+
+                startActivityForResult(chooserIntent, PICK_IMAGE);
+
+            }
+        });
+
         return view;
     }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Avatars/"+Email+".jpg");
+        if (requestCode == PICK_IMAGE && resultCode == RESULT_OK && null != data) {
+            storageReference.delete();
+            InputStream inputStream = null;
+            try {
+                inputStream = getActivity().getContentResolver().openInputStream(data.getData());
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            storageReference.putStream(inputStream).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                        Toast.makeText(getActivity(), "Error!", Toast.LENGTH_SHORT).show();
+                    }
+                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                        // ...
+                        ImageView buttonUpload = (ImageView) getActivity().findViewById(R.id.imageViewAvatar);
 
+                        GlideApp.with(getActivity()).load(storageReference).signature(new ObjectKey(taskSnapshot.getMetadata())).placeholder(R.drawable.baseline_perm_contact_calendar_24).into(buttonUpload);
+                        Toast.makeText(getActivity(), "Successfully uploaded!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+        }
+    }
 }

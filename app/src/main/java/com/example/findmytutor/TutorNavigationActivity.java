@@ -41,6 +41,7 @@ public class TutorNavigationActivity extends AppCompatActivity {
                         Fragment fragment;
                         switch (item.getItemId()) {
                             case R.id.Availability:
+                            default:
                                 fragment = Availability;
                                 fragment.setArguments(bundle);
                                 break;
@@ -49,7 +50,6 @@ public class TutorNavigationActivity extends AppCompatActivity {
                                 fragment.setArguments(bundle);
                                 break;
                             case R.id.Search:
-                            default:
                                 fragment = Search;
                                 fragment.setArguments(bundle);
                                 break;

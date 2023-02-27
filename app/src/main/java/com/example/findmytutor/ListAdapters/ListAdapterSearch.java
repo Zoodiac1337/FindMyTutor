@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.Registry;
 import com.bumptech.glide.annotation.GlideModule;
 import com.bumptech.glide.module.AppGlideModule;
+import com.bumptech.glide.signature.ObjectKey;
 import com.example.findmytutor.GlideApp;
 import com.example.findmytutor.R;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
@@ -80,7 +81,7 @@ public class ListAdapterSearch extends BaseAdapter {
         viewHolder.txtName.setText(name[position]);
 //        viewHolder.imageAvatar.setImageResource(R.drawable.baseline_person_24);
         StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Avatars/"+email[position]+".jpg");
-        GlideApp.with(context).load(storageReference).placeholder(R.drawable.baseline_person_24).into(viewHolder.imageAvatar);
+        GlideApp.with(context).load(storageReference).signature(new ObjectKey(storageReference.getMetadata())).placeholder(R.drawable.baseline_person_24).into(viewHolder.imageAvatar);
 
         if (availability[position].equals("Available"))
             viewHolder.imageAvailability.setImageResource(R.drawable.baseline_event_available_24);
