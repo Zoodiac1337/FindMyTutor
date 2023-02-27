@@ -8,8 +8,16 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.Registry;
+import com.bumptech.glide.annotation.GlideModule;
+import com.bumptech.glide.module.AppGlideModule;
 import com.example.findmytutor.R;
+import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -17,12 +25,14 @@ public class ListAdapterSearch extends BaseAdapter {
     Context context;
     private final String [] name;
     private final String [] availability;
+    private final String [] email;
 
-    public ListAdapterSearch(Context context, String [] names, String [] availabilities){
+    public ListAdapterSearch(Context context, String [] names, String [] availabilities, String [] emails){
         //super(context, R.layout.single_list_app_item, utilsArrayList);
         this.context = context;
         this.name = names;
         this.availability = availabilities;
+        this.email = emails;
     }
 
     @Override
@@ -56,7 +66,6 @@ public class ListAdapterSearch extends BaseAdapter {
             viewHolder.imageAvailability = (ImageView) convertView.findViewById(R.id.availability_imageView);
             viewHolder.imageAvatar = (ImageView) convertView.findViewById(R.id.avatar_imageView);
 
-
             result=convertView;
 
             convertView.setTag(viewHolder);
@@ -68,7 +77,10 @@ public class ListAdapterSearch extends BaseAdapter {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
         viewHolder.txtName.setText(name[position]);
-        viewHolder.imageAvatar.setImageResource(R.drawable.baseline_person_24);
+//        viewHolder.imageAvatar.setImageResource(R.drawable.baseline_person_24);
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Avatars/"+email[position]+".jpg");
+        GlideApp.with(context).load(storageReference).placeholder(R.drawable.baseline_person_24).into(viewHolder.imageAvatar);
+
         if (availability[position].equals("Available"))
             viewHolder.imageAvailability.setImageResource(R.drawable.baseline_event_available_24);
         else if (availability[position].equals("Tentative"))

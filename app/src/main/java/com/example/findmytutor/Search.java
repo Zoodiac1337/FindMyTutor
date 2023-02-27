@@ -86,11 +86,13 @@ public class Search extends Fragment {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 String[] name = new String[task.getResult().size()];
                 String[] availability = new String[task.getResult().size()];
+                String[] email = new String[task.getResult().size()];
                 if (task.isSuccessful()) {
                     int i = 0;
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         name[i] = (document.getString("lastName") + ", " + document.getString("firstName"));
                         availability[i] = document.getString("availability");
+                        email[i] = document.getId();
                         i++;
                     }
 
@@ -102,7 +104,7 @@ public class Search extends Fragment {
                 ListAdapterSearch lAdapter;
                 lView = (ListView) view.findViewById(R.id.searchList);
 
-                lAdapter = new ListAdapterSearch(getActivity(), name, availability);
+                lAdapter = new ListAdapterSearch(getActivity(), name, availability, email);
 
                 lView.setAdapter(lAdapter);
 

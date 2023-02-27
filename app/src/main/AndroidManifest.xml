@@ -41,6 +41,10 @@
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
+            <meta-data
+                android:name="com.bumptech.glide.module.AppGlideModule"
+                android:value="com.example.findmytutor.ListAdapters.MyAppGlideModule" />
+
         </activity>
     </application>
 
