@@ -1,12 +1,38 @@
 package com.example.findmytutor;
 
+import static android.content.ContentValues.TAG;
+
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.bumptech.glide.signature.ObjectKey;
+import com.example.findmytutor.ListAdapters.ListAdapterSearch;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -55,10 +81,124 @@ public class Favourites extends Fragment {
         }
     }
 
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    String currentUser = "";
+
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_favourites, container, false);
+
+        Bundle bundle = getArguments();
+        currentUser = bundle.getString("email");
+
+        View view = inflater.inflate(R.layout.fragment_favourites, container, false);
+        TextView titleTextView = (TextView) getActivity().findViewById(R.id.TitleTextView);
+
+
+        titleTextView.setText("Favourites");
+
+
+        db.document("Student/"+currentUser).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    List<String> favourites = (List<String>) document.get("favourites");
+                    if (favourites.isEmpty()) Toast.makeText(getActivity(), "You don't have any favourites!", Toast.LENGTH_SHORT).show();
+                    else getListItems(view, favourites);
+                }
+            }
+        });
+
+
+        return view;
+    }
+    public void getListItems(View view, List favourites ){
+        db.collection("Tutor").orderBy("lastName", Query.Direction.ASCENDING).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                String[] name = new String[favourites.size()];
+                String[] availability = new String[favourites.size()];
+                String[] email = new String[favourites.size()];
+                String[] department = new String[favourites.size()];
+                String[] description = new String[favourites.size()];
+                String[] title = new String[favourites.size()];
+                if (task.isSuccessful()) {
+                    int i = 0;
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        if (favourites.contains(document.getId())) {
+                            name[i] = (document.getString("lastName") + ", " + document.getString("firstName"));
+                            availability[i] = document.getString("availability");
+                            email[i] = document.getId();
+                            department[i] = document.getString("department");
+                            description[i] = document.getString("description");
+                            title[i] = document.getString("title");
+                            i++;
+                        }
+                    }
+                    populateListWithItems(favourites, name, availability, email, department, description, title);
+
+                } else {
+                    Log.d(TAG, "Error getting documents: ", task.getException());
+                }
+            }
+        });
+    }
+    public void populateListWithItems(List favourites, String[] name, String[] availability, String[] email, String[] department, String[] description, String[] title){
+        LinearLayout singleTutorLayout = (LinearLayout) getActivity().findViewById(R.id.singleTutor) ;
+
+        ListAdapterSearch lAdapter;
+        ListView searchListView = (ListView) getActivity().findViewById(R.id.favouritesList);
+
+        lAdapter = new ListAdapterSearch(getContext(), name, availability, email);
+
+        searchListView.setAdapter(lAdapter);
+        TextView SingleTutorName = (TextView) getActivity().findViewById(R.id.singleTutorName);
+        TextView SingleTutorAvailabilityText = (TextView) getActivity().findViewById(R.id.singleTutorAvailabilityText);
+        TextView SingleTutorTitle = (TextView) getActivity().findViewById(R.id.singleTutorTitle);
+        TextView SingleTutorDepartment = (TextView) getActivity().findViewById(R.id.singleTutorDepartment);
+        TextView SingleTutorDescription = (TextView) getActivity().findViewById(R.id.singleTutorDescription);
+        ImageView SingleTutorAvatar = (ImageView) getActivity().findViewById(R.id.singleTutorAvatar);
+        ImageView SingleTutorAvailabilityImage = (ImageView) getActivity().findViewById(R.id.singleTutorAvailabilityImage);
+        Button FavouritesButton = (Button) getActivity().findViewById(R.id.singleTutorFavouritesButton);
+
+        searchListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Avatars/"+email[i]+".jpg");
+                GlideApp.with(view).load(storageReference).signature(new ObjectKey(storageReference.getMetadata())).placeholder(R.drawable.baseline_person_24).into(SingleTutorAvatar);
+
+                if (availability[i].equals("Available"))
+                    SingleTutorAvailabilityImage.setImageResource(R.drawable.baseline_event_available_24);
+                else if (availability[i].equals("Tentative"))
+                    SingleTutorAvailabilityImage.setImageResource(R.drawable.baseline_event_24);
+                else
+                    SingleTutorAvailabilityImage.setImageResource(R.drawable.baseline_event_busy_24);
+
+                SingleTutorName.setText(name[i]);
+                SingleTutorAvailabilityText.setText(availability[i]);
+                SingleTutorTitle.setText(title[i]);
+                SingleTutorDepartment.setText(department[i]);
+                SingleTutorDescription.setText(description[i]);
+
+                searchListView.setVisibility(View.GONE);
+                singleTutorLayout.setVisibility(View.VISIBLE);
+                FavouritesButton.setText("Remove from favourites");
+                FavouritesButton.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        searchListView.setVisibility(View.VISIBLE);
+                        singleTutorLayout.setVisibility(View.GONE);
+                        favourites.remove(email[i]);
+                        getListItems(view, favourites);
+
+                        db.document("Student/"+currentUser).update("favourites", favourites);
+                    }
+                });
+            }
+        });
     }
 }

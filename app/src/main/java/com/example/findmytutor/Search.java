@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -24,6 +25,7 @@ import com.bumptech.glide.signature.ObjectKey;
 import com.example.findmytutor.ListAdapters.ListAdapterSearch;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -32,6 +34,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -81,17 +84,24 @@ public class Search extends Fragment {
         }
     }
 
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    String currentUser = "";
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        Bundle bundle = getArguments();
+        currentUser = bundle.getString("email");
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         View view = inflater.inflate(R.layout.fragment_search, container, false);
         TextView titleTextView = (TextView) getActivity().findViewById(R.id.TitleTextView);
-        ListView searchListView = (ListView) view.findViewById(R.id.searchList);
-        LinearLayout singleTutorLayout = (LinearLayout) view.findViewById(R.id.singleTutor) ;
         titleTextView.setText("Search");
 
+        getListItems(view);
+
+        return view;
+    }
+    public void getListItems(View view){
         db.collection("Tutor").orderBy("lastName", Query.Direction.ASCENDING).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -112,51 +122,101 @@ public class Search extends Fragment {
                         title[i] = document.getString("title");
                         i++;
                     }
-
+                    populateListWithItems(view, name, availability, email, department, description, title);
                 } else {
                     Log.d(TAG, "Error getting documents: ", task.getException());
                 }
-                ListView lView;
 
-                ListAdapterSearch lAdapter;
-                lView = (ListView) view.findViewById(R.id.searchList);
-
-                lAdapter = new ListAdapterSearch(getActivity(), name, availability, email);
-
-                lView.setAdapter(lAdapter);
-                TextView SingleTutorName = (TextView) view.findViewById(R.id.singleTutorName);
-                TextView SingleTutorAvailabilityText = (TextView) view.findViewById(R.id.singleTutorAvailabilityText);
-                TextView SingleTutorTitle = (TextView) view.findViewById(R.id.singleTutorTitle);
-                TextView SingleTutorDepartment = (TextView) view.findViewById(R.id.singleTutorDepartment);
-                TextView SingleTutorDescription = (TextView) view.findViewById(R.id.singleTutorDescription);
-                ImageView SingleTutorAvatar = (ImageView) view.findViewById(R.id.singleTutorAvatar);
-                ImageView SingleTutorAvailabilityImage = (ImageView) view.findViewById(R.id.singleTutorAvailabilityImage);
-
-                lView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Avatars/"+email[i]+".jpg");
-                        GlideApp.with(view).load(storageReference).signature(new ObjectKey(storageReference.getMetadata())).placeholder(R.drawable.baseline_person_24).into(SingleTutorAvatar);
-
-                        if (availability[i].equals("Available"))
-                            SingleTutorAvailabilityImage.setImageResource(R.drawable.baseline_event_available_24);
-                        else if (availability[i].equals("Tentative"))
-                            SingleTutorAvailabilityImage.setImageResource(R.drawable.baseline_event_24);
-                        else
-                            SingleTutorAvailabilityImage.setImageResource(R.drawable.baseline_event_busy_24);
-
-                        SingleTutorName.setText(name[i]);
-                        SingleTutorAvailabilityText.setText(availability[i]);
-                        SingleTutorTitle.setText(title[i]);
-                        SingleTutorDepartment.setText(department[i]);
-                        SingleTutorDescription.setText(description[i]);
-
-                        searchListView.setVisibility(View.GONE);
-                        singleTutorLayout.setVisibility(View.VISIBLE);
-                    }
-                });
             }
         });
-        return view;
     }
+    public void populateListWithItems(View view, String[] name, String[] availability, String[] email, String[] department, String[] description, String[] title) {
+        ListView searchListView = (ListView) view.findViewById(R.id.searchList);
+        LinearLayout singleTutorLayout = (LinearLayout) view.findViewById(R.id.singleTutor) ;
+
+        ListAdapterSearch lAdapter;
+
+        lAdapter = new ListAdapterSearch(getActivity(), name, availability, email);
+
+        searchListView.setAdapter(lAdapter);
+        TextView SingleTutorName = (TextView) view.findViewById(R.id.singleTutorName);
+        TextView SingleTutorAvailabilityText = (TextView) view.findViewById(R.id.singleTutorAvailabilityText);
+        TextView SingleTutorTitle = (TextView) view.findViewById(R.id.singleTutorTitle);
+        TextView SingleTutorDepartment = (TextView) view.findViewById(R.id.singleTutorDepartment);
+        TextView SingleTutorDescription = (TextView) view.findViewById(R.id.singleTutorDescription);
+        ImageView SingleTutorAvatar = (ImageView) view.findViewById(R.id.singleTutorAvatar);
+        ImageView SingleTutorAvailabilityImage = (ImageView) view.findViewById(R.id.singleTutorAvailabilityImage);
+
+
+        searchListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Avatars/"+email[i]+".jpg");
+                GlideApp.with(view).load(storageReference).signature(new ObjectKey(storageReference.getMetadata())).placeholder(R.drawable.baseline_person_24).into(SingleTutorAvatar);
+
+                if (availability[i].equals("Available"))
+                    SingleTutorAvailabilityImage.setImageResource(R.drawable.baseline_event_available_24);
+                else if (availability[i].equals("Tentative"))
+                    SingleTutorAvailabilityImage.setImageResource(R.drawable.baseline_event_24);
+                else
+                    SingleTutorAvailabilityImage.setImageResource(R.drawable.baseline_event_busy_24);
+
+                SingleTutorName.setText(name[i]);
+                SingleTutorAvailabilityText.setText(availability[i]);
+                SingleTutorTitle.setText(title[i]);
+                SingleTutorDepartment.setText(department[i]);
+                SingleTutorDescription.setText(description[i]);
+
+                searchListView.setVisibility(View.GONE);
+                singleTutorLayout.setVisibility(View.VISIBLE);
+
+                getFavourites(view, email[i]);
+            }
+        });
+    }
+    public void deleteButton(View view, String email, List favourites){
+        Button FavouritesButton = (Button) getActivity().findViewById(R.id.singleTutorFavouritesButton);
+        FavouritesButton.setText("Remove from favourites");
+        FavouritesButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                favourites.remove(email);
+                db.document("Student/"+currentUser).update("favourites", favourites);
+                getFavourites(view, email);
+            }
+        });
+    }
+
+    public void addButton(View view, String email, List favourites){
+        Button FavouritesButton = (Button) getActivity().findViewById(R.id.singleTutorFavouritesButton);
+        FavouritesButton.setText("Add to favourites");
+        FavouritesButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                favourites.add(email);
+                db.document("Student/"+currentUser).update("favourites", favourites);
+                getFavourites(view, email);
+            }
+        });
+    }
+
+    public void getFavourites(View view, String email){
+        db.document("Student/"+currentUser).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    List<String> favourites = (List<String>) document.get("favourites");
+                    if (favourites.contains(email))
+                        deleteButton(view, email,favourites);
+                    else addButton(view, email,favourites);
+                }
+            }
+        });
+    }
+
 }

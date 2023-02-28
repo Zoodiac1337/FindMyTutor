@@ -31,7 +31,6 @@ public class TutorNavigationActivity extends AppCompatActivity {
         final Fragment Chat = new Chat();
         final Fragment Search = new Search();
 
-
         Bundle bundle = getIntent().getExtras();
 
         Availability.setArguments(bundle);
