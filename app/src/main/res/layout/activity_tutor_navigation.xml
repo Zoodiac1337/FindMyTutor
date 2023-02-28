@@ -24,7 +24,7 @@
             android:onClick="logoutButton"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
-            app:srcCompat="@drawable/baseline_arrow_back_ios_new_24" />
+            app:srcCompat="@drawable/baseline_logout_24" />
 
         <TextView
             android:id="@+id/TitleTextView"

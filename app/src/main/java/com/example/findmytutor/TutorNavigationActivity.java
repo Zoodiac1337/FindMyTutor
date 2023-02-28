@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -23,11 +24,13 @@ public class TutorNavigationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_tutor_navigation);
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        TextView titleTextView = findViewById(R.id.TitleTextView);
         final FragmentManager fragmentManager = getSupportFragmentManager();
 
         final Fragment Availability = new Availability();
         final Fragment Chat = new Chat();
         final Fragment Search = new Search();
+
 
         Bundle bundle = getIntent().getExtras();
 

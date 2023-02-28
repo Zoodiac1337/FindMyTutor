@@ -14,15 +14,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.signature.ObjectKey;
 import com.example.findmytutor.ListAdapters.ListAdapterSearch;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.Date;
 
@@ -80,19 +87,29 @@ public class Search extends Fragment {
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         View view = inflater.inflate(R.layout.fragment_search, container, false);
+        TextView titleTextView = (TextView) getActivity().findViewById(R.id.TitleTextView);
+        ListView searchListView = (ListView) view.findViewById(R.id.searchList);
+        LinearLayout singleTutorLayout = (LinearLayout) view.findViewById(R.id.singleTutor) ;
+        titleTextView.setText("Search");
 
-        db.collection("Tutor").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        db.collection("Tutor").orderBy("lastName", Query.Direction.ASCENDING).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 String[] name = new String[task.getResult().size()];
                 String[] availability = new String[task.getResult().size()];
                 String[] email = new String[task.getResult().size()];
+                String[] department = new String[task.getResult().size()];
+                String[] description = new String[task.getResult().size()];
+                String[] title = new String[task.getResult().size()];
                 if (task.isSuccessful()) {
                     int i = 0;
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         name[i] = (document.getString("lastName") + ", " + document.getString("firstName"));
                         availability[i] = document.getString("availability");
                         email[i] = document.getId();
+                        department[i] = document.getString("department");
+                        description[i] = document.getString("description");
+                        title[i] = document.getString("title");
                         i++;
                     }
 
@@ -107,11 +124,35 @@ public class Search extends Fragment {
                 lAdapter = new ListAdapterSearch(getActivity(), name, availability, email);
 
                 lView.setAdapter(lAdapter);
+                TextView SingleTutorName = (TextView) view.findViewById(R.id.singleTutorName);
+                TextView SingleTutorAvailabilityText = (TextView) view.findViewById(R.id.singleTutorAvailabilityText);
+                TextView SingleTutorTitle = (TextView) view.findViewById(R.id.singleTutorTitle);
+                TextView SingleTutorDepartment = (TextView) view.findViewById(R.id.singleTutorDepartment);
+                TextView SingleTutorDescription = (TextView) view.findViewById(R.id.singleTutorDescription);
+                ImageView SingleTutorAvatar = (ImageView) view.findViewById(R.id.singleTutorAvatar);
+                ImageView SingleTutorAvailabilityImage = (ImageView) view.findViewById(R.id.singleTutorAvailabilityImage);
 
                 lView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        Toast.makeText(getActivity(), " " + name[i], Toast.LENGTH_SHORT).show();
+                        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Avatars/"+email[i]+".jpg");
+                        GlideApp.with(view).load(storageReference).signature(new ObjectKey(storageReference.getMetadata())).placeholder(R.drawable.baseline_person_24).into(SingleTutorAvatar);
+
+                        if (availability[i].equals("Available"))
+                            SingleTutorAvailabilityImage.setImageResource(R.drawable.baseline_event_available_24);
+                        else if (availability[i].equals("Tentative"))
+                            SingleTutorAvailabilityImage.setImageResource(R.drawable.baseline_event_24);
+                        else
+                            SingleTutorAvailabilityImage.setImageResource(R.drawable.baseline_event_busy_24);
+
+                        SingleTutorName.setText(name[i]);
+                        SingleTutorAvailabilityText.setText(availability[i]);
+                        SingleTutorTitle.setText(title[i]);
+                        SingleTutorDepartment.setText(department[i]);
+                        SingleTutorDescription.setText(description[i]);
+
+                        searchListView.setVisibility(View.GONE);
+                        singleTutorLayout.setVisibility(View.VISIBLE);
                     }
                 });
             }

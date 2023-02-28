@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.signature.ObjectKey;
@@ -111,6 +112,7 @@ public class Availability extends Fragment {
         LinearLayout locationLayout = (LinearLayout) view.findViewById(R.id.locationLayout);
         LinearLayout timeLayout = (LinearLayout) view.findViewById(R.id.timeLayout);
         BottomNavigationView bottomNavigationView = (BottomNavigationView) view.findViewById(R.id.availability_navigation);
+        TextView titleTextView = (TextView) getActivity().findViewById(R.id.TitleTextView);
         Email = bundle.getString("email");
 
         StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Avatars/"+Email+".jpg");
@@ -154,6 +156,7 @@ public class Availability extends Fragment {
                     department.setText(document.getString("department"));
                     description.setText(document.getString("description"));
                     location.setText(document.getString("location"));
+                    titleTextView.setText(document.getString("lastName") + ", " + document.getString("firstName"));
                     try {
                         time.setText(document.getDate("time").toString());
                     } catch (Exception e) {
