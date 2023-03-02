@@ -30,6 +30,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -61,6 +62,7 @@ public class Availability extends Fragment {
     private String mParam2;
     private String Availability = "Available";
     private String Email;
+    private Long avatarVersion;
     public static final int PICK_IMAGE = 1;
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -97,9 +99,11 @@ public class Availability extends Fragment {
         }
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Bundle bundle = getArguments();
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_availability, container, false);
         EditText title = (EditText) view.findViewById(R.id.editTextTitle);
@@ -116,7 +120,6 @@ public class Availability extends Fragment {
         Email = bundle.getString("email");
 
         StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Avatars/"+Email+".jpg");
-        GlideApp.with(getActivity()).load(storageReference).signature(new ObjectKey(System.currentTimeMillis() / (24 * 60 * 60 * 1000))).placeholder(R.drawable.baseline_perm_contact_calendar_24).into(imageUpload);
 
         bottomNavigationView.setOnItemSelectedListener(
                 new NavigationBarView.OnItemSelectedListener() {
@@ -157,6 +160,8 @@ public class Availability extends Fragment {
                     description.setText(document.getString("description"));
                     location.setText(document.getString("location"));
                     titleTextView.setText(document.getString("lastName") + ", " + document.getString("firstName"));
+                    avatarVersion = document.getLong("avatarVersion");
+                    GlideApp.with(getActivity()).load(storageReference).signature(new ObjectKey(Email + avatarVersion)).placeholder(R.drawable.baseline_perm_contact_calendar_24).into(imageUpload);
                     try {
                         time.setText(document.getDate("time").toString());
                     } catch (Exception e) {
@@ -247,6 +252,8 @@ public class Availability extends Fragment {
         StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Avatars/"+Email+".jpg");
         if (requestCode == PICK_IMAGE && resultCode == RESULT_OK && null != data) {
             storageReference.delete();
+            db.document("Tutor/"+Email).update("avatarVersion", FieldValue.increment(1));
+            avatarVersion ++;
             InputStream inputStream = null;
             try {
                 inputStream = getActivity().getContentResolver().openInputStream(data.getData());
@@ -266,7 +273,7 @@ public class Availability extends Fragment {
                         // ...
                         ImageView buttonUpload = (ImageView) getActivity().findViewById(R.id.imageViewAvatar);
 
-                        GlideApp.with(getActivity()).load(storageReference).signature(new ObjectKey(System.currentTimeMillis() / (24 * 60 * 60 * 1000))).placeholder(R.drawable.baseline_perm_contact_calendar_24).into(buttonUpload);
+                        GlideApp.with(getActivity()).load(storageReference).signature(new ObjectKey(Email + avatarVersion)).placeholder(R.drawable.baseline_perm_contact_calendar_24).into(buttonUpload);
                         Toast.makeText(getActivity(), "Successfully uploaded!", Toast.LENGTH_SHORT).show();
                     }
                 });

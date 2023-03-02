@@ -34,13 +34,13 @@ public class RegisterActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
     }
 
-    public void signup(String email, String password){
+    public void signup(String email, String password, String type, String sEmail, Map<String, Object> user){
         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
+                    db.collection(type).document(sEmail).set(user);
                     Log.d("RegisterActivity", "createUserWithEmail:success");
-                    FirebaseUser user = mAuth.getCurrentUser();
                     Intent myIntent = new Intent(RegisterActivity.this, MainActivity.class);
                     startActivity(myIntent);
                     finish();
@@ -65,6 +65,13 @@ public class RegisterActivity extends AppCompatActivity {
         user.put("firstName", firstName.getText().toString());
         user.put("lastName", lastName.getText().toString());
         user.put("favourites", favourites);
+        user.put("avatarVersion", 1);
+        user.put("availability", "");
+        user.put("department", "");
+        user.put("description", "");
+        user.put("location", "");
+        user.put("time", "");
+        user.put("title", "");
         String type = "";
         String sEmail = email.getText().toString();
         String sPassword = password.getText().toString();
@@ -76,8 +83,7 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
         if (sPassword.equals(sPassword2)){
-            signup(sEmail, sPassword);
-            db.collection(type).document(sEmail).set(user);
+            signup(sEmail, sPassword, type, sEmail, user);
         }
         else Toast.makeText(RegisterActivity.this, "Passwords do not match.", Toast.LENGTH_SHORT).show();
     }

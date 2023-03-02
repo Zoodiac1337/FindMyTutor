@@ -3,6 +3,7 @@ package com.example.findmytutor;
 import static android.content.ContentValues.TAG;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -90,7 +91,6 @@ public class Search extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         // Inflate the layout for this fragment
         Bundle bundle = getArguments();
         currentUser = bundle.getString("email");
@@ -98,8 +98,10 @@ public class Search extends Fragment {
             type = "Student";
         else if (currentUser.endsWith("@ntu.ac.uk"))
             type = "Tutor";
+
         View view = inflater.inflate(R.layout.fragment_search, container, false);
         TextView titleTextView = (TextView) getActivity().findViewById(R.id.TitleTextView);
+
         titleTextView.setText("Search");
 
         getListItems(view);
@@ -116,6 +118,7 @@ public class Search extends Fragment {
                 String[] department = new String[task.getResult().size()];
                 String[] description = new String[task.getResult().size()];
                 String[] title = new String[task.getResult().size()];
+                Long[] avatarVersion = new Long [task.getResult().size()];
                 if (task.isSuccessful()) {
                     int i = 0;
                     for (QueryDocumentSnapshot document : task.getResult()) {
@@ -125,9 +128,10 @@ public class Search extends Fragment {
                         department[i] = document.getString("department");
                         description[i] = document.getString("description");
                         title[i] = document.getString("title");
+                        avatarVersion[i] = document.getLong("avatarVersion");
                         i++;
                     }
-                    populateListWithItems(view, name, availability, email, department, description, title);
+                    populateListWithItems(view, name, availability, email, department, description, title, avatarVersion);
                 } else {
                     Log.d(TAG, "Error getting documents: ", task.getException());
                 }
@@ -135,13 +139,13 @@ public class Search extends Fragment {
             }
         });
     }
-    public void populateListWithItems(View view, String[] name, String[] availability, String[] email, String[] department, String[] description, String[] title) {
+    public void populateListWithItems(View view, String[] name, String[] availability, String[] email, String[] department, String[] description, String[] title, Long [] avatarVersion) {
         ListView searchListView = (ListView) view.findViewById(R.id.searchList);
         LinearLayout singleTutorLayout = (LinearLayout) view.findViewById(R.id.singleTutor) ;
 
         ListAdapterSearch lAdapter;
 
-        lAdapter = new ListAdapterSearch(getActivity(), name, availability, email);
+        lAdapter = new ListAdapterSearch(getActivity(), name, availability, email, avatarVersion);
 
         searchListView.setAdapter(lAdapter);
         TextView SingleTutorName = (TextView) view.findViewById(R.id.singleTutorName);
@@ -157,7 +161,7 @@ public class Search extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Avatars/"+email[i]+".jpg");
-                GlideApp.with(view).load(storageReference).signature(new ObjectKey(System.currentTimeMillis() / (24 * 60 * 60 * 1000))).placeholder(R.drawable.baseline_person_24).into(SingleTutorAvatar);
+                GlideApp.with(view).load(storageReference).signature(new ObjectKey(email[i]+avatarVersion[i])).placeholder(R.drawable.baseline_person_24).into(SingleTutorAvatar);
 
                 if (availability[i].equals("Available"))
                     SingleTutorAvailabilityImage.setImageResource(R.drawable.baseline_event_available_24);
@@ -176,6 +180,23 @@ public class Search extends Fragment {
                 singleTutorLayout.setVisibility(View.VISIBLE);
 
                 getFavourites(view, email[i]);
+
+                Button EmailButton = (Button) getActivity().findViewById(R.id.singleTutorEmailButton);
+                EmailButton.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        try {
+                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                            Uri data = Uri.parse("mailto:"+email[i]+"?subject=" + Uri.encode("Sent by Find My Tutor app."));
+                            intent.setData(data);
+                            startActivity(intent);
+                        } catch (android.content.ActivityNotFoundException e) {
+                            Toast.makeText(getActivity(), "There is no email client installed.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
         });
     }

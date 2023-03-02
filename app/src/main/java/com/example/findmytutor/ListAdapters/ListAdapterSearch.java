@@ -28,13 +28,15 @@ public class ListAdapterSearch extends BaseAdapter {
     private final String [] name;
     private final String [] availability;
     private final String [] email;
+    private final Long [] avatarVersion;
 
-    public ListAdapterSearch(Context context, String [] names, String [] availabilities, String [] emails){
+    public ListAdapterSearch(Context context, String [] names, String [] availabilities, String [] emails, Long [] avatarVersions){
         //super(context, R.layout.single_list_app_item, utilsArrayList);
         this.context = context;
         this.name = names;
         this.availability = availabilities;
         this.email = emails;
+        this.avatarVersion = avatarVersions;
     }
 
     @Override
@@ -81,7 +83,9 @@ public class ListAdapterSearch extends BaseAdapter {
         viewHolder.txtName.setText(name[position]);
 //        viewHolder.imageAvatar.setImageResource(R.drawable.baseline_person_24);
         StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Avatars/"+email[position]+".jpg");
-        GlideApp.with(context).load(storageReference).signature(new ObjectKey(System.currentTimeMillis() / (24 * 60 * 60 * 1000))).placeholder(R.drawable.baseline_person_24).into(viewHolder.imageAvatar);
+//        GlideApp.with(context).load(storageReference).signature(new ObjectKey(System.currentTimeMillis() / (24 * 60 * 60 * 1000))).placeholder(R.drawable.baseline_person_24).into(viewHolder.imageAvatar);
+
+        GlideApp.with(context).load(storageReference).signature(new ObjectKey(email[position]+avatarVersion[position])).placeholder(R.drawable.baseline_person_24).into(viewHolder.imageAvatar);
         if (availability[position].equals("Available"))
             viewHolder.imageAvailability.setImageResource(R.drawable.baseline_event_available_24);
         else if (availability[position].equals("Tentative"))

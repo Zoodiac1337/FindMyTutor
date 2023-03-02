@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -71,6 +73,10 @@ public class TutorNavigationActivity extends AppCompatActivity {
         fragmentManager.beginTransaction().replace(R.id.FragmentedView, Availability).commit();
     }
 
+    public void backButton(View view){
+        this.onBackPressed();
+    }
+
     public void logoutButton(View view){
         FirebaseAuth.getInstance().signOut();
         Intent myIntent = new Intent(TutorNavigationActivity.this, MainActivity.class);
@@ -80,22 +86,30 @@ public class TutorNavigationActivity extends AppCompatActivity {
     @Override
     public void onBackPressed()
     {
-        Toast.makeText(this, "Back button pressed", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "Back button pressed", Toast.LENGTH_SHORT).show();
         if (screen == 1) {
             fragmentManager.beginTransaction().detach(Availability).commit();
             fragmentManager.beginTransaction().attach(Availability).commit();
         }
-        else if (screen == 2) {
-            fragmentManager.beginTransaction().detach(Favourites).commit();
-            fragmentManager.beginTransaction().attach(Favourites).commit();
+        if (screen == 2) {
+            ListView searchListView = (ListView) this.findViewById(R.id.favouritesList);
+            LinearLayout singleTutorLayout = (LinearLayout) this.findViewById(R.id.singleTutor);
+            if (singleTutorLayout.getVisibility() == View.VISIBLE) {
+                singleTutorLayout.setVisibility(View.GONE);
+                searchListView.setVisibility(View.VISIBLE);
+            }
         }
         else if (screen == 3) {
             fragmentManager.beginTransaction().detach(Chat).commit();
             fragmentManager.beginTransaction().attach(Chat).commit();
         }
         else if (screen == 4) {
-            fragmentManager.beginTransaction().detach(Search).commit();
-            fragmentManager.beginTransaction().attach(Search).commit();
+            ListView searchListView = (ListView) this.findViewById(R.id.searchList);
+            LinearLayout singleTutorLayout = (LinearLayout) this.findViewById(R.id.singleTutor);
+            if (singleTutorLayout.getVisibility() == View.VISIBLE) {
+                singleTutorLayout.setVisibility(View.GONE);
+                searchListView.setVisibility(View.VISIBLE);
+            }
         }
     }
 }

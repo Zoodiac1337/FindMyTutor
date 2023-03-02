@@ -3,6 +3,7 @@ package com.example.findmytutor;
 import static android.content.ContentValues.TAG;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -99,7 +100,6 @@ public class Favourites extends Fragment {
         View view = inflater.inflate(R.layout.fragment_favourites, container, false);
         TextView titleTextView = (TextView) getActivity().findViewById(R.id.TitleTextView);
 
-
         titleTextView.setText("Favourites");
 
 
@@ -128,6 +128,7 @@ public class Favourites extends Fragment {
                 String[] department = new String[favourites.size()];
                 String[] description = new String[favourites.size()];
                 String[] title = new String[favourites.size()];
+                Long [] avatarVersion = new Long [favourites.size()];
                 if (task.isSuccessful()) {
                     int i = 0;
                     for (QueryDocumentSnapshot document : task.getResult()) {
@@ -138,10 +139,11 @@ public class Favourites extends Fragment {
                             department[i] = document.getString("department");
                             description[i] = document.getString("description");
                             title[i] = document.getString("title");
+                            avatarVersion[i] = document.getLong("avatarVersion");
                             i++;
                         }
                     }
-                    populateListWithItems(favourites, name, availability, email, department, description, title);
+                    populateListWithItems(favourites, name, availability, email, department, description, title, avatarVersion);
 
                 } else {
                     Log.d(TAG, "Error getting documents: ", task.getException());
@@ -149,13 +151,13 @@ public class Favourites extends Fragment {
             }
         });
     }
-    public void populateListWithItems(List favourites, String[] name, String[] availability, String[] email, String[] department, String[] description, String[] title){
+    public void populateListWithItems(List favourites, String[] name, String[] availability, String[] email, String[] department, String[] description, String[] title, Long [] avatarVersion){
         LinearLayout singleTutorLayout = (LinearLayout) getActivity().findViewById(R.id.singleTutor) ;
 
         ListAdapterSearch lAdapter;
         ListView searchListView = (ListView) getActivity().findViewById(R.id.favouritesList);
 
-        lAdapter = new ListAdapterSearch(getContext(), name, availability, email);
+        lAdapter = new ListAdapterSearch(getContext(), name, availability, email, avatarVersion);
 
         searchListView.setAdapter(lAdapter);
         TextView SingleTutorName = (TextView) getActivity().findViewById(R.id.singleTutorName);
@@ -172,7 +174,7 @@ public class Favourites extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
                 StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Avatars/"+email[i]+".jpg");
-                GlideApp.with(view).load(storageReference).signature(new ObjectKey(System.currentTimeMillis() / (24 * 60 * 60 * 1000))).placeholder(R.drawable.baseline_person_24).into(SingleTutorAvatar);
+                GlideApp.with(view).load(storageReference).signature(new ObjectKey(email[i]+avatarVersion[i])).placeholder(R.drawable.baseline_person_24).into(SingleTutorAvatar);
 
                 if (availability[i].equals("Available"))
                     SingleTutorAvailabilityImage.setImageResource(R.drawable.baseline_event_available_24);
@@ -189,14 +191,32 @@ public class Favourites extends Fragment {
 
                 searchListView.setVisibility(View.GONE);
                 singleTutorLayout.setVisibility(View.VISIBLE);
+
+                Button EmailButton = (Button) getActivity().findViewById(R.id.singleTutorEmailButton);
+                EmailButton.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        try {
+                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                            Uri data = Uri.parse("mailto:"+email[i]+"?subject=" + Uri.encode("Sent by Find My Tutor app."));
+                            intent.setData(data);
+                            startActivity(intent);
+                        } catch (android.content.ActivityNotFoundException e) {
+                            Toast.makeText(getActivity(), "There is no email client installed.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
                 FavouritesButton.setText("Remove from favourites");
                 FavouritesButton.setOnClickListener(new View.OnClickListener()
                 {
                     @Override
                     public void onClick(View v)
                     {
-                        searchListView.setVisibility(View.VISIBLE);
                         singleTutorLayout.setVisibility(View.GONE);
+                        searchListView.setVisibility(View.VISIBLE);
                         favourites.remove(email[i]);
                         getListItems(view, favourites);
 
