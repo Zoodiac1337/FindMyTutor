@@ -116,7 +116,7 @@ public class Availability extends Fragment {
         Email = bundle.getString("email");
 
         StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Avatars/"+Email+".jpg");
-        GlideApp.with(getActivity()).load(storageReference).signature(new ObjectKey(storageReference.getMetadata())).placeholder(R.drawable.baseline_perm_contact_calendar_24).into(imageUpload);
+        GlideApp.with(getActivity()).load(storageReference).signature(new ObjectKey(System.currentTimeMillis() / (24 * 60 * 60 * 1000))).placeholder(R.drawable.baseline_perm_contact_calendar_24).into(imageUpload);
 
         bottomNavigationView.setOnItemSelectedListener(
                 new NavigationBarView.OnItemSelectedListener() {
@@ -266,7 +266,7 @@ public class Availability extends Fragment {
                         // ...
                         ImageView buttonUpload = (ImageView) getActivity().findViewById(R.id.imageViewAvatar);
 
-                        GlideApp.with(getActivity()).load(storageReference).signature(new ObjectKey(taskSnapshot.getMetadata())).placeholder(R.drawable.baseline_perm_contact_calendar_24).into(buttonUpload);
+                        GlideApp.with(getActivity()).load(storageReference).signature(new ObjectKey(System.currentTimeMillis() / (24 * 60 * 60 * 1000))).placeholder(R.drawable.baseline_perm_contact_calendar_24).into(buttonUpload);
                         Toast.makeText(getActivity(), "Successfully uploaded!", Toast.LENGTH_SHORT).show();
                     }
                 });

@@ -17,6 +17,12 @@ import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class TutorNavigationActivity extends AppCompatActivity {
+    int screen = 1;
+    final FragmentManager fragmentManager = getSupportFragmentManager();
+    final Fragment Favourites = new Favourites();
+    final Fragment Availability = new Availability();
+    final Fragment Chat = new Chat();
+    final Fragment Search = new Search();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,17 +30,13 @@ public class TutorNavigationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_tutor_navigation);
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        TextView titleTextView = findViewById(R.id.TitleTextView);
-        final FragmentManager fragmentManager = getSupportFragmentManager();
-
-        final Fragment Availability = new Availability();
-        final Fragment Chat = new Chat();
-        final Fragment Search = new Search();
 
         Bundle bundle = getIntent().getExtras();
 
+        Favourites.setArguments(bundle);
+        Search.setArguments(bundle);
         Availability.setArguments(bundle);
-        fragmentManager.beginTransaction().replace(R.id.FragmentedView, Availability).commit();
+
 
         bottomNavigationView.setOnItemSelectedListener(
                 new NavigationBarView.OnItemSelectedListener() {
@@ -45,15 +47,19 @@ public class TutorNavigationActivity extends AppCompatActivity {
                             case R.id.Availability:
                             default:
                                 fragment = Availability;
-                                fragment.setArguments(bundle);
+                                screen = 1;
+                                break;
+                            case R.id.Favourites:
+                                fragment = Favourites;
+                                screen = 2;
                                 break;
                             case R.id.Chat:
                                 fragment = Chat;
-                                fragment.setArguments(bundle);
+                                screen = 3;
                                 break;
                             case R.id.Search:
                                 fragment = Search;
-                                fragment.setArguments(bundle);
+                                screen = 4;
                                 break;
                         }
                         fragmentManager.beginTransaction().replace(R.id.FragmentedView, fragment).commit();
@@ -61,7 +67,8 @@ public class TutorNavigationActivity extends AppCompatActivity {
                     }
                 });
         // Set default selection
-        bottomNavigationView.setSelectedItemId(R.id.Favourites);
+        bottomNavigationView.setSelectedItemId(R.id.Availability);
+        fragmentManager.beginTransaction().replace(R.id.FragmentedView, Availability).commit();
     }
 
     public void logoutButton(View view){
@@ -69,5 +76,26 @@ public class TutorNavigationActivity extends AppCompatActivity {
         Intent myIntent = new Intent(TutorNavigationActivity.this, MainActivity.class);
         startActivity(myIntent);
         finish();
+    }
+    @Override
+    public void onBackPressed()
+    {
+        Toast.makeText(this, "Back button pressed", Toast.LENGTH_SHORT).show();
+        if (screen == 1) {
+            fragmentManager.beginTransaction().detach(Availability).commit();
+            fragmentManager.beginTransaction().attach(Availability).commit();
+        }
+        else if (screen == 2) {
+            fragmentManager.beginTransaction().detach(Favourites).commit();
+            fragmentManager.beginTransaction().attach(Favourites).commit();
+        }
+        else if (screen == 3) {
+            fragmentManager.beginTransaction().detach(Chat).commit();
+            fragmentManager.beginTransaction().attach(Chat).commit();
+        }
+        else if (screen == 4) {
+            fragmentManager.beginTransaction().detach(Search).commit();
+            fragmentManager.beginTransaction().attach(Search).commit();
+        }
     }
 }

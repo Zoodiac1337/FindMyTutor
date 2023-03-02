@@ -6,6 +6,11 @@
         android:icon="@drawable/baseline_check_circle_outline_24"
         android:title="@string/Availability"/>
     <item
+        android:id="@+id/Favourites"
+        android:enabled="true"
+        android:icon="@drawable/ic_baseline_star_outline_24"
+        android:title="@string/Favourites"/>
+    <item
         android:id="@+id/Chat"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_chat_bubble_outline_24"

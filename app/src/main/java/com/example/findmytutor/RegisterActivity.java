@@ -17,7 +17,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -36,14 +39,14 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    Log.d("MainActivity", "createUserWithEmail:success");
+                    Log.d("RegisterActivity", "createUserWithEmail:success");
                     FirebaseUser user = mAuth.getCurrentUser();
                     Intent myIntent = new Intent(RegisterActivity.this, MainActivity.class);
                     startActivity(myIntent);
                     finish();
                 } else {
                     // If sign in fails, display a message to the user.
-                    Log.w("MainActivity", "createUserWithEmail:failure", task.getException());
+                    Log.w("RegisterActivity", "createUserWithEmail:failure", task.getException());
                     Toast.makeText(RegisterActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -58,8 +61,10 @@ public class RegisterActivity extends AppCompatActivity {
         EditText lastName = findViewById(R.id.LastName);
 
         Map<String, Object> user = new HashMap<>();
+        List <String> favourites = new ArrayList<>();
         user.put("firstName", firstName.getText().toString());
         user.put("lastName", lastName.getText().toString());
+        user.put("favourites", favourites);
         String type = "";
         String sEmail = email.getText().toString();
         String sPassword = password.getText().toString();

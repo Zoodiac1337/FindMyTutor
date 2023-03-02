@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -23,6 +24,7 @@ public class StudentNavigationActivity extends AppCompatActivity {
     final Fragment Favourites = new Favourites();
     final Fragment Chat = new Chat();
     final Fragment Search = new Search();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +72,7 @@ public class StudentNavigationActivity extends AppCompatActivity {
         startActivity(myIntent);
         finish();
     }
+
     @Override
     public void onBackPressed()
     {

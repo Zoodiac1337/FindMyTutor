@@ -86,13 +86,18 @@ public class Search extends Fragment {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     String currentUser = "";
+    String type = "";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         Bundle bundle = getArguments();
         currentUser = bundle.getString("email");
-
+        if (currentUser.endsWith("@my.ntu.ac.uk"))
+            type = "Student";
+        else if (currentUser.endsWith("@ntu.ac.uk"))
+            type = "Tutor";
         View view = inflater.inflate(R.layout.fragment_search, container, false);
         TextView titleTextView = (TextView) getActivity().findViewById(R.id.TitleTextView);
         titleTextView.setText("Search");
@@ -152,7 +157,7 @@ public class Search extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Avatars/"+email[i]+".jpg");
-                GlideApp.with(view).load(storageReference).signature(new ObjectKey(storageReference.getMetadata())).placeholder(R.drawable.baseline_person_24).into(SingleTutorAvatar);
+                GlideApp.with(view).load(storageReference).signature(new ObjectKey(System.currentTimeMillis() / (24 * 60 * 60 * 1000))).placeholder(R.drawable.baseline_person_24).into(SingleTutorAvatar);
 
                 if (availability[i].equals("Available"))
                     SingleTutorAvailabilityImage.setImageResource(R.drawable.baseline_event_available_24);
@@ -183,7 +188,7 @@ public class Search extends Fragment {
             public void onClick(View v)
             {
                 favourites.remove(email);
-                db.document("Student/"+currentUser).update("favourites", favourites);
+                db.document(type+"/"+currentUser).update("favourites", favourites);
                 getFavourites(view, email);
             }
         });
@@ -198,20 +203,20 @@ public class Search extends Fragment {
             public void onClick(View v)
             {
                 favourites.add(email);
-                db.document("Student/"+currentUser).update("favourites", favourites);
+                db.document(type+"/"+currentUser).update("favourites", favourites);
                 getFavourites(view, email);
             }
         });
     }
 
     public void getFavourites(View view, String email){
-        db.document("Student/"+currentUser).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        db.document(type+"/"+currentUser).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     List<String> favourites = (List<String>) document.get("favourites");
-                    if (favourites.contains(email))
+                    if (favourites != null && favourites.contains(email))
                         deleteButton(view, email,favourites);
                     else addButton(view, email,favourites);
                 }

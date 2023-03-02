@@ -81,8 +81,7 @@ public class ListAdapterSearch extends BaseAdapter {
         viewHolder.txtName.setText(name[position]);
 //        viewHolder.imageAvatar.setImageResource(R.drawable.baseline_person_24);
         StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Avatars/"+email[position]+".jpg");
-        GlideApp.with(context).load(storageReference).signature(new ObjectKey(storageReference.getMetadata())).placeholder(R.drawable.baseline_person_24).into(viewHolder.imageAvatar);
-
+        GlideApp.with(context).load(storageReference).signature(new ObjectKey(System.currentTimeMillis() / (24 * 60 * 60 * 1000))).placeholder(R.drawable.baseline_person_24).into(viewHolder.imageAvatar);
         if (availability[position].equals("Available"))
             viewHolder.imageAvailability.setImageResource(R.drawable.baseline_event_available_24);
         else if (availability[position].equals("Tentative"))

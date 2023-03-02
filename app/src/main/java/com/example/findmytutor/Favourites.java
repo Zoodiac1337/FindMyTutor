@@ -83,7 +83,7 @@ public class Favourites extends Fragment {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     String currentUser = "";
-
+    String type = "";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -91,6 +91,10 @@ public class Favourites extends Fragment {
 
         Bundle bundle = getArguments();
         currentUser = bundle.getString("email");
+        if (currentUser.endsWith("@my.ntu.ac.uk"))
+            type = "Student";
+        else if (currentUser.endsWith("@ntu.ac.uk"))
+            type = "Tutor";
 
         View view = inflater.inflate(R.layout.fragment_favourites, container, false);
         TextView titleTextView = (TextView) getActivity().findViewById(R.id.TitleTextView);
@@ -99,7 +103,7 @@ public class Favourites extends Fragment {
         titleTextView.setText("Favourites");
 
 
-        db.document("Student/"+currentUser).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        db.document(type+"/"+currentUser).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
@@ -166,8 +170,9 @@ public class Favourites extends Fragment {
         searchListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
                 StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Avatars/"+email[i]+".jpg");
-                GlideApp.with(view).load(storageReference).signature(new ObjectKey(storageReference.getMetadata())).placeholder(R.drawable.baseline_person_24).into(SingleTutorAvatar);
+                GlideApp.with(view).load(storageReference).signature(new ObjectKey(System.currentTimeMillis() / (24 * 60 * 60 * 1000))).placeholder(R.drawable.baseline_person_24).into(SingleTutorAvatar);
 
                 if (availability[i].equals("Available"))
                     SingleTutorAvailabilityImage.setImageResource(R.drawable.baseline_event_available_24);
@@ -195,7 +200,7 @@ public class Favourites extends Fragment {
                         favourites.remove(email[i]);
                         getListItems(view, favourites);
 
-                        db.document("Student/"+currentUser).update("favourites", favourites);
+                        db.document(type+"/"+currentUser).update("favourites", favourites);
                     }
                 });
             }
