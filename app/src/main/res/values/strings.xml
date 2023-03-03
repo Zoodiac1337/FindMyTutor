@@ -11,4 +11,5 @@
     <string name="Available" >Available</string>
     <string name="Tentative" >Tentative</string>
     <string name="Busy" >Busy</string>
+    <string name="MazeMap" >MazeMap</string>
 </resources>

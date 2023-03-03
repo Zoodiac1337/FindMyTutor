@@ -3,12 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Chat">
+    tools:context=".MazeMap">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <WebView
+        android:id="@+id/mazemap_webView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Chat fragment" />
+        />
 
 </FrameLayout>

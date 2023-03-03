@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -23,7 +22,7 @@ public class TutorNavigationActivity extends AppCompatActivity {
     final FragmentManager fragmentManager = getSupportFragmentManager();
     final Fragment Favourites = new Favourites();
     final Fragment Availability = new Availability();
-    final Fragment Chat = new Chat();
+    final Fragment MazeMap = new MazeMap();
     final Fragment Search = new Search();
 
     @Override
@@ -32,45 +31,47 @@ public class TutorNavigationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_tutor_navigation);
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-
+        TextView titleTextView = findViewById(R.id.TitleTextView);
         Bundle bundle = getIntent().getExtras();
 
         Favourites.setArguments(bundle);
         Search.setArguments(bundle);
         Availability.setArguments(bundle);
 
+        fragmentManager.beginTransaction().add(R.id.FragmentedView, Availability).add(R.id.FragmentedView, MazeMap).add(R.id.FragmentedView, Favourites).add(R.id.FragmentedView, Search).commit();
+
+
 
         bottomNavigationView.setOnItemSelectedListener(
                 new NavigationBarView.OnItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                        Fragment fragment;
                         switch (item.getItemId()) {
                             case R.id.Availability:
                             default:
-                                fragment = Availability;
+                                fragmentManager.beginTransaction().hide(MazeMap).detach(Search).detach(Favourites).attach(Availability).commit();
                                 screen = 1;
                                 break;
                             case R.id.Favourites:
-                                fragment = Favourites;
+                                fragmentManager.beginTransaction().hide(MazeMap).detach(Search).detach(Availability).attach(Favourites).commit();
                                 screen = 2;
                                 break;
-                            case R.id.Chat:
-                                fragment = Chat;
+                            case R.id.MazeMap:
+                                titleTextView.setText("NTU Maze Map");
+                                fragmentManager.beginTransaction().show(MazeMap).detach(Search).detach(Favourites).detach(Availability).commit();
                                 screen = 3;
                                 break;
                             case R.id.Search:
-                                fragment = Search;
+                                fragmentManager.beginTransaction().hide(MazeMap).detach(Availability).detach(Favourites).attach(Search).commit();
                                 screen = 4;
                                 break;
                         }
-                        fragmentManager.beginTransaction().replace(R.id.FragmentedView, fragment).commit();
                         return true;
                     }
                 });
         // Set default selection
         bottomNavigationView.setSelectedItemId(R.id.Availability);
-        fragmentManager.beginTransaction().replace(R.id.FragmentedView, Availability).commit();
+        fragmentManager.beginTransaction().hide(MazeMap).detach(Search).detach(Favourites).attach(Availability).commit();
     }
 
     public void backButton(View view){
@@ -100,8 +101,8 @@ public class TutorNavigationActivity extends AppCompatActivity {
             }
         }
         else if (screen == 3) {
-            fragmentManager.beginTransaction().detach(Chat).commit();
-            fragmentManager.beginTransaction().attach(Chat).commit();
+//            fragmentManager.beginTransaction().detach(MazeMap).commit();
+//            fragmentManager.beginTransaction().attach(MazeMap).commit();
         }
         else if (screen == 4) {
             ListView searchListView = (ListView) this.findViewById(R.id.searchList);

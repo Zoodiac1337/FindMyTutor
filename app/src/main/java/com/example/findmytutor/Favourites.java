@@ -143,7 +143,7 @@ public class Favourites extends Fragment {
                             i++;
                         }
                     }
-                    populateListWithItems(favourites, name, availability, email, department, description, title, avatarVersion);
+                    populateListWithItems(view, favourites, name, availability, email, department, description, title, avatarVersion);
 
                 } else {
                     Log.d(TAG, "Error getting documents: ", task.getException());
@@ -151,23 +151,23 @@ public class Favourites extends Fragment {
             }
         });
     }
-    public void populateListWithItems(List favourites, String[] name, String[] availability, String[] email, String[] department, String[] description, String[] title, Long [] avatarVersion){
-        LinearLayout singleTutorLayout = (LinearLayout) getActivity().findViewById(R.id.singleTutor) ;
+    public void populateListWithItems(View view, List favourites, String[] name, String[] availability, String[] email, String[] department, String[] description, String[] title, Long [] avatarVersion){
+        LinearLayout singleTutorLayout = (LinearLayout) view.findViewById(R.id.singleTutor) ;
 
         ListAdapterSearch lAdapter;
-        ListView searchListView = (ListView) getActivity().findViewById(R.id.favouritesList);
+        ListView searchListView = (ListView) view.findViewById(R.id.favouritesList);
 
         lAdapter = new ListAdapterSearch(getContext(), name, availability, email, avatarVersion);
 
         searchListView.setAdapter(lAdapter);
-        TextView SingleTutorName = (TextView) getActivity().findViewById(R.id.singleTutorName);
-        TextView SingleTutorAvailabilityText = (TextView) getActivity().findViewById(R.id.singleTutorAvailabilityText);
-        TextView SingleTutorTitle = (TextView) getActivity().findViewById(R.id.singleTutorTitle);
-        TextView SingleTutorDepartment = (TextView) getActivity().findViewById(R.id.singleTutorDepartment);
-        TextView SingleTutorDescription = (TextView) getActivity().findViewById(R.id.singleTutorDescription);
-        ImageView SingleTutorAvatar = (ImageView) getActivity().findViewById(R.id.singleTutorAvatar);
-        ImageView SingleTutorAvailabilityImage = (ImageView) getActivity().findViewById(R.id.singleTutorAvailabilityImage);
-        Button FavouritesButton = (Button) getActivity().findViewById(R.id.singleTutorFavouritesButton);
+        TextView SingleTutorName = (TextView) view.findViewById(R.id.singleTutorName);
+        TextView SingleTutorAvailabilityText = (TextView) view.findViewById(R.id.singleTutorAvailabilityText);
+        TextView SingleTutorTitle = (TextView) view.findViewById(R.id.singleTutorTitle);
+        TextView SingleTutorDepartment = (TextView) view.findViewById(R.id.singleTutorDepartment);
+        TextView SingleTutorDescription = (TextView) view.findViewById(R.id.singleTutorDescription);
+        ImageView SingleTutorAvatar = (ImageView) view.findViewById(R.id.singleTutorAvatar);
+        ImageView SingleTutorAvailabilityImage = (ImageView) view.findViewById(R.id.singleTutorAvailabilityImage);
+        Button FavouritesButton = (Button) view.findViewById(R.id.singleTutorFavouritesButton);
 
         searchListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

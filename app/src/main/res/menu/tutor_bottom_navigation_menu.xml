@@ -11,10 +11,10 @@
         android:icon="@drawable/ic_baseline_star_outline_24"
         android:title="@string/Favourites"/>
     <item
-        android:id="@+id/Chat"
+        android:id="@+id/MazeMap"
         android:enabled="true"
-        android:icon="@drawable/ic_baseline_chat_bubble_outline_24"
-        android:title="@string/Chat"/>
+        android:icon="@drawable/ic_baseline_map_24"
+        android:title="@string/MazeMap"/>
     <item
         android:id="@+id/Search"
         android:enabled="true"

@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -20,13 +21,14 @@ public class StudentNavigationActivity extends AppCompatActivity {
     int screen = 1;
     final FragmentManager fragmentManager = getSupportFragmentManager();
     final Fragment Favourites = new Favourites();
-    final Fragment Chat = new Chat();
+    final Fragment MazeMap = new MazeMap();
     final Fragment Search = new Search();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_navigation);
+        TextView titleTextView = findViewById(R.id.TitleTextView);
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
@@ -35,33 +37,35 @@ public class StudentNavigationActivity extends AppCompatActivity {
         Favourites.setArguments(bundle);
         Search.setArguments(bundle);
 
+        fragmentManager.beginTransaction().add(R.id.FragmentedView, MazeMap).add(R.id.FragmentedView, Favourites).add(R.id.FragmentedView, Search).commit();
 
         bottomNavigationView.setOnItemSelectedListener(
                 new NavigationBarView.OnItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                        Fragment fragment;
                         switch (item.getItemId()) {
                             case R.id.Favourites:
-                                fragment = Favourites;
+                                fragmentManager.beginTransaction().hide(MazeMap).detach(Search).attach(Favourites).commit();
                                 screen = 1;
                                 break;
-                            case R.id.Chat:
-                                fragment = Chat;
+                            case R.id.MazeMap:
+                                titleTextView.setText("NTU Maze Map");
+                                fragmentManager.beginTransaction().detach(Favourites).detach(Search).show(MazeMap).commit();
                                 screen = 2;
                                 break;
                             case R.id.Search:
                             default:
-                                fragment = Search;
+                                fragmentManager.beginTransaction().detach(Favourites).hide(MazeMap).attach(Search).commit();
                                 screen = 3;
                                 break;
                         }
-                        fragmentManager.beginTransaction().replace(R.id.FragmentedView, fragment).commit();
+
                         return true;
                     }
                 });
         // Set default selection
-        fragmentManager.beginTransaction().replace(R.id.FragmentedView, Favourites).commit();
+//        fragmentManager.beginTransaction().replace(R.id.FragmentedView, Favourites).commit();
+        fragmentManager.beginTransaction().hide(MazeMap).detach(Search).attach(Favourites).commit();
         bottomNavigationView.setSelectedItemId(R.id.Favourites);
     }
     public void backButton(View view){
@@ -88,8 +92,8 @@ public class StudentNavigationActivity extends AppCompatActivity {
                 }
             }
             else if (screen == 2) {
-            fragmentManager.beginTransaction().detach(Chat).commit();
-            fragmentManager.beginTransaction().attach(Chat).commit();
+//            fragmentManager.beginTransaction().detach(MazeMap).commit();
+//            fragmentManager.beginTransaction().attach(MazeMap).commit();
             }
             else if (screen == 3) {
                 ListView searchListView = (ListView) this.findViewById(R.id.searchList);
