@@ -171,7 +171,7 @@ public class Search extends Fragment {
                     SingleTutorAvailabilityImage.setImageResource(R.drawable.baseline_event_busy_24);
 
                 SingleTutorName.setText(name[i]);
-                SingleTutorAvailabilityText.setText(availability[i]);
+                SingleTutorAvailabilityText.setText(availability[i]+" at: "+location[i]);
                 SingleTutorTitle.setText(title[i]);
                 SingleTutorDepartment.setText(department[i]);
                 SingleTutorDescription.setText(description[i]);
