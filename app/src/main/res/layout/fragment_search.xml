@@ -116,12 +116,12 @@
                 android:paddingBottom="20dp">
 
                 <Button
-                    android:id="@+id/singleTutorChatButton"
+                    android:id="@+id/singleTutorMazeMapButton"
                     style="@style/Widget.Material3.Button.IconButton.Filled"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Chat"
+                    android:text="Location"
                     android:textSize="14sp" />
 
                 <Button

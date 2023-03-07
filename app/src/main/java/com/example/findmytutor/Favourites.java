@@ -8,6 +8,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -128,6 +129,7 @@ public class Favourites extends Fragment {
                 String[] department = new String[favourites.size()];
                 String[] description = new String[favourites.size()];
                 String[] title = new String[favourites.size()];
+                String[] location = new String[favourites.size()];
                 Long [] avatarVersion = new Long [favourites.size()];
                 if (task.isSuccessful()) {
                     int i = 0;
@@ -140,10 +142,11 @@ public class Favourites extends Fragment {
                             description[i] = document.getString("description");
                             title[i] = document.getString("title");
                             avatarVersion[i] = document.getLong("avatarVersion");
+                            location[i] = document.getString("location");
                             i++;
                         }
                     }
-                    populateListWithItems(view, favourites, name, availability, email, department, description, title, avatarVersion);
+                    populateListWithItems(view, favourites, name, availability, email, department, description, title, avatarVersion, location);
 
                 } else {
                     Log.d(TAG, "Error getting documents: ", task.getException());
@@ -151,7 +154,7 @@ public class Favourites extends Fragment {
             }
         });
     }
-    public void populateListWithItems(View view, List favourites, String[] name, String[] availability, String[] email, String[] department, String[] description, String[] title, Long [] avatarVersion){
+    public void populateListWithItems(View view, List favourites, String[] name, String[] availability, String[] email, String[] department, String[] description, String[] title, Long [] avatarVersion, String [] location){
         LinearLayout singleTutorLayout = (LinearLayout) view.findViewById(R.id.singleTutor) ;
 
         ListAdapterSearch lAdapter;
@@ -208,6 +211,26 @@ public class Favourites extends Fragment {
                         }
                     }
                 });
+
+                Button Location = (Button) getActivity().findViewById(R.id.singleTutorMazeMapButton);
+                if (availability[i].equals("Available") || availability[i].equals("Tentative")) {
+                    Location.setVisibility(View.VISIBLE);
+                    Location.setOnClickListener(new View.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(View v)
+                        {
+                            FragmentManager fm = getParentFragmentManager();
+                            MazeMap frag = (MazeMap)fm.findFragmentByTag("MazeMap");
+                            if (type.equals("Tutor"))
+                                ((TutorNavigationActivity) getActivity()).switchToMazeMap();
+                            else
+                                ((StudentNavigationActivity) getActivity()).switchToMazeMap();
+                            frag.changeUrl(location[i]);
+                        }
+                    });
+                }
+                else Location.setVisibility(View.GONE);
 
                 FavouritesButton.setText("Remove from favourites");
                 FavouritesButton.setOnClickListener(new View.OnClickListener()

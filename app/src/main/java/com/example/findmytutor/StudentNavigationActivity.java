@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -28,7 +29,6 @@ public class StudentNavigationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_navigation);
-        TextView titleTextView = findViewById(R.id.TitleTextView);
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
@@ -37,7 +37,7 @@ public class StudentNavigationActivity extends AppCompatActivity {
         Favourites.setArguments(bundle);
         Search.setArguments(bundle);
 
-        fragmentManager.beginTransaction().add(R.id.FragmentedView, MazeMap).add(R.id.FragmentedView, Favourites).add(R.id.FragmentedView, Search).commit();
+        fragmentManager.beginTransaction().add(R.id.FragmentedView, MazeMap, "MazeMap").add(R.id.FragmentedView, Favourites).add(R.id.FragmentedView, Search).commit();
 
         bottomNavigationView.setOnItemSelectedListener(
                 new NavigationBarView.OnItemSelectedListener() {
@@ -49,7 +49,6 @@ public class StudentNavigationActivity extends AppCompatActivity {
                                 screen = 1;
                                 break;
                             case R.id.MazeMap:
-                                titleTextView.setText("NTU Maze Map");
                                 fragmentManager.beginTransaction().detach(Favourites).detach(Search).show(MazeMap).commit();
                                 screen = 2;
                                 break;
@@ -64,8 +63,6 @@ public class StudentNavigationActivity extends AppCompatActivity {
                     }
                 });
         // Set default selection
-//        fragmentManager.beginTransaction().replace(R.id.FragmentedView, Favourites).commit();
-        fragmentManager.beginTransaction().hide(MazeMap).detach(Search).attach(Favourites).commit();
         bottomNavigationView.setSelectedItemId(R.id.Favourites);
     }
     public void backButton(View view){
@@ -103,5 +100,9 @@ public class StudentNavigationActivity extends AppCompatActivity {
                     searchListView.setVisibility(View.VISIBLE);
                 }
             }
+    }
+    public void switchToMazeMap(){
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setSelectedItemId(R.id.MazeMap);
     }
 }

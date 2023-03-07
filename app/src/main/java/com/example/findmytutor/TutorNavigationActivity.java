@@ -38,7 +38,7 @@ public class TutorNavigationActivity extends AppCompatActivity {
         Search.setArguments(bundle);
         Availability.setArguments(bundle);
 
-        fragmentManager.beginTransaction().add(R.id.FragmentedView, Availability).add(R.id.FragmentedView, MazeMap).add(R.id.FragmentedView, Favourites).add(R.id.FragmentedView, Search).commit();
+        fragmentManager.beginTransaction().add(R.id.FragmentedView, Availability).add(R.id.FragmentedView, MazeMap, "MazeMap").add(R.id.FragmentedView, Favourites).add(R.id.FragmentedView, Search).commit();
 
 
 
@@ -71,7 +71,6 @@ public class TutorNavigationActivity extends AppCompatActivity {
                 });
         // Set default selection
         bottomNavigationView.setSelectedItemId(R.id.Availability);
-        fragmentManager.beginTransaction().hide(MazeMap).detach(Search).detach(Favourites).attach(Availability).commit();
     }
 
     public void backButton(View view){
@@ -112,5 +111,9 @@ public class TutorNavigationActivity extends AppCompatActivity {
                 searchListView.setVisibility(View.VISIBLE);
             }
         }
+    }
+    public void switchToMazeMap(){
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setSelectedItemId(R.id.MazeMap);
     }
 }

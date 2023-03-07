@@ -1,7 +1,6 @@
 package com.example.findmytutor;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
@@ -16,6 +15,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -63,19 +63,19 @@ public class MazeMap extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
-
+    WebView myWebView;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maze_map, container, false);
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // Request camera permission
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 201);
-        } else {
-//            // Camera permission already granted, start camera preview
-//            startActivityForResult(new Intent(getActivity(), QR_scanner.class),1);
         }
 
-        WebView myWebView = (WebView) view.findViewById(R.id.mazemap_webView);
+        TextView titleTextView = (TextView) getActivity().findViewById(R.id.TitleTextView);
+        titleTextView.setText("NTU Maze Map");
+
+        myWebView = (WebView) view.findViewById(R.id.mazemap_webView);
         WebSettings webSettings = myWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         myWebView.setWebChromeClient(new WebChromeClient() {
@@ -83,10 +83,11 @@ public class MazeMap extends Fragment {
                 callback.invoke(origin, true, false);
             }
         });
-
-        myWebView.loadUrl("https://use.mazemap.com/#v=1&config=NTU&zlevel=1&center=-1.185719,52.911951&zoom=15.4&campusid=745");
-
-        // Inflate the layout for this fragment
+            myWebView.loadUrl("https://use.mazemap.com/#v=1&center=-1.185719,52.911951&zoom=15.4&campusid=745");
         return view;
+    }
+    public void changeUrl(String location){
+        Toast.makeText(getActivity(), location, Toast.LENGTH_SHORT).show();
+        myWebView.loadUrl("https://use.mazemap.com/?campusid=745&search="+location);
     }
 }
