@@ -14,10 +14,13 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +42,7 @@ import com.google.firebase.storage.UploadTask;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -61,6 +65,7 @@ public class Availability extends Fragment {
     private String mParam1;
     private String mParam2;
     private String Availability = "Available";
+    private String Campus = "";
     private String Email;
     private Long avatarVersion;
     public static final int PICK_IMAGE = 1;
@@ -112,12 +117,31 @@ public class Availability extends Fragment {
         EditText location = (EditText) view.findViewById(R.id.editTextLocation);
         EditText time = (EditText) view.findViewById(R.id.editTextEndAfter);
         ImageView imageUpload = (ImageView) view.findViewById(R.id.imageViewAvatar);
+        Spinner dropdown = (Spinner) view.findViewById(R.id.spinner);
 
         LinearLayout locationLayout = (LinearLayout) view.findViewById(R.id.locationLayout);
         LinearLayout timeLayout = (LinearLayout) view.findViewById(R.id.timeLayout);
         BottomNavigationView bottomNavigationView = (BottomNavigationView) view.findViewById(R.id.availability_navigation);
         TextView titleTextView = (TextView) getActivity().findViewById(R.id.TitleTextView);
         Email = bundle.getString("email");
+
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+        String[] items = new String[]{"City", "Clifton", "Brackenhurst", "Creative Quarter", "Mansfield"};
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, items);
+        dropdown.setAdapter(adapter);
+        dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                Campus = parentView.getItemAtPosition(position).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                Campus = "City";
+            }
+
+        });
 
         StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Avatars/"+Email+".jpg");
 
@@ -161,11 +185,12 @@ public class Availability extends Fragment {
                     location.setText(document.getString("location"));
                     titleTextView.setText(document.getString("lastName") + ", " + document.getString("firstName"));
                     avatarVersion = document.getLong("avatarVersion");
+                    if (!document.getString("campus").isEmpty())dropdown.setSelection(adapter.getPosition(document.getString("campus")));
                     GlideApp.with(getActivity()).load(storageReference).signature(new ObjectKey(Email + avatarVersion)).placeholder(R.drawable.baseline_perm_contact_calendar_24).into(imageUpload);
                     try {
                         time.setText(document.getDate("time").toString());
                     } catch (Exception e) {
-                        time.setText(new Timestamp(System.currentTimeMillis()).toString());
+                        time.setText(sdf.format(new Timestamp(System.currentTimeMillis())));
                     }
 
                 }
@@ -201,12 +226,18 @@ public class Availability extends Fragment {
                                 tutor.put("department", department.getText().toString());
                                 tutor.put("description", description.getText().toString());
                                 tutor.put("availability", Availability);
+                                tutor.put("campus", Campus);
                                 if (Availability.equals("Busy")) {
                                     tutor.put("location", "");
                                     tutor.put("time", new Timestamp(System.currentTimeMillis()));
                                 } else {
+                                    try {
+                                        Date date = sdf.parse(time.getText().toString());
+                                        tutor.put("time", date);
+                                    } catch (ParseException e) {
+                                    }
                                     tutor.put("location", location.getText().toString());
-                                    tutor.put("time", time.getText().toString());
+
                                 }
 
                                 docRef.update(tutor);

@@ -72,6 +72,7 @@ public class RegisterActivity extends AppCompatActivity {
         user.put("location", "");
         user.put("time", "");
         user.put("title", "");
+        user.put("campus","");
         String type = "";
         String sEmail = email.getText().toString();
         String sPassword = password.getText().toString();

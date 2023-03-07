@@ -117,6 +117,7 @@ public class Search extends Fragment {
                 String[] description = new String[task.getResult().size()];
                 String[] title = new String[task.getResult().size()];
                 String[] location = new String[task.getResult().size()];
+                String[] campus = new String[task.getResult().size()];
                 Long[] avatarVersion = new Long [task.getResult().size()];
                 if (task.isSuccessful()) {
                     int i = 0;
@@ -129,9 +130,10 @@ public class Search extends Fragment {
                         title[i] = document.getString("title");
                         avatarVersion[i] = document.getLong("avatarVersion");
                         location[i] = document.getString("location");
+                        campus[i] = document.getString("campus");
                         i++;
                     }
-                    populateListWithItems(view, name, availability, email, department, description, title, avatarVersion, location);
+                    populateListWithItems(view, name, availability, email, department, description, title, avatarVersion, location, campus);
                 } else {
                     Log.d(TAG, "Error getting documents: ", task.getException());
                 }
@@ -139,7 +141,7 @@ public class Search extends Fragment {
             }
         });
     }
-    public void populateListWithItems(View view, String[] name, String[] availability, String[] email, String[] department, String[] description, String[] title, Long [] avatarVersion, String [] location) {
+    public void populateListWithItems(View view, String[] name, String[] availability, String[] email, String[] department, String[] description, String[] title, Long [] avatarVersion, String [] location, String campus[]) {
         ListView searchListView = (ListView) view.findViewById(R.id.searchList);
         LinearLayout singleTutorLayout = (LinearLayout) view.findViewById(R.id.singleTutor) ;
 
@@ -163,15 +165,20 @@ public class Search extends Fragment {
                 StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Avatars/"+email[i]+".jpg");
                 GlideApp.with(view).load(storageReference).signature(new ObjectKey(email[i]+avatarVersion[i])).placeholder(R.drawable.baseline_person_24).into(SingleTutorAvatar);
 
-                if (availability[i].equals("Available"))
+                if (availability[i].equals("Available")) {
                     SingleTutorAvailabilityImage.setImageResource(R.drawable.baseline_event_available_24);
-                else if (availability[i].equals("Tentative"))
+                    SingleTutorAvailabilityText.setText(availability[i]+" at: "+location[i]+" on "+campus[i]+" Campus");
+                }
+                else if (availability[i].equals("Tentative")) {
                     SingleTutorAvailabilityImage.setImageResource(R.drawable.baseline_event_24);
-                else
+                    SingleTutorAvailabilityText.setText(availability[i]+" at: "+location[i]+" on "+campus[i]+" Campus");
+                }
+                else {
                     SingleTutorAvailabilityImage.setImageResource(R.drawable.baseline_event_busy_24);
+                    SingleTutorAvailabilityText.setText(availability[i]);
+                }
 
                 SingleTutorName.setText(name[i]);
-                SingleTutorAvailabilityText.setText(availability[i]+" at: "+location[i]);
                 SingleTutorTitle.setText(title[i]);
                 SingleTutorDepartment.setText(department[i]);
                 SingleTutorDescription.setText(description[i]);
@@ -212,7 +219,7 @@ public class Search extends Fragment {
                                 ((TutorNavigationActivity) getActivity()).switchToMazeMap();
                             else
                                 ((StudentNavigationActivity) getActivity()).switchToMazeMap();
-                            frag.changeUrl(location[i]);
+                            frag.changeUrl(location[i], campus[i]);
                         }
                     });
                 }

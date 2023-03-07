@@ -167,7 +167,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="5"
-                android:src="@drawable/baseline_location_on_24" />
+                android:src="@drawable/baseline_location_24" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -179,19 +179,32 @@
                     android:id="@+id/textView4"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="5"
+                    android:layout_weight="310000"
                     android:gravity="bottom"
                     android:text="Location" />
-
-                <EditText
-                    android:id="@+id/editTextLocation"
+                <LinearLayout
+                    android:id="@+id/locationLayout2"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="3"
-                    android:ems="10"
-                    android:gravity="top"
-                    android:hint="Location"
-                    android:inputType="textPersonName" />
+                    android:layout_height="50dp"
+                    android:layout_weight="3">
+
+                    <EditText
+                        android:id="@+id/editTextLocation"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:gravity="top"
+                        android:hint="Location"
+                        android:inputType="textPersonName" />
+                    <Spinner
+                        android:id="@+id/spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:layout_gravity="center"
+                        android:spinnerMode="dropdown" />
+                </LinearLayout>
             </LinearLayout>
 
         </LinearLayout>

@@ -130,6 +130,7 @@ public class Favourites extends Fragment {
                 String[] description = new String[favourites.size()];
                 String[] title = new String[favourites.size()];
                 String[] location = new String[favourites.size()];
+                String[] campus = new String[favourites.size()];
                 Long [] avatarVersion = new Long [favourites.size()];
                 if (task.isSuccessful()) {
                     int i = 0;
@@ -143,10 +144,11 @@ public class Favourites extends Fragment {
                             title[i] = document.getString("title");
                             avatarVersion[i] = document.getLong("avatarVersion");
                             location[i] = document.getString("location");
+                            campus[i] = document.getString("campus");
                             i++;
                         }
                     }
-                    populateListWithItems(view, favourites, name, availability, email, department, description, title, avatarVersion, location);
+                    populateListWithItems(view, favourites, name, availability, email, department, description, title, avatarVersion, location, campus);
 
                 } else {
                     Log.d(TAG, "Error getting documents: ", task.getException());
@@ -154,7 +156,7 @@ public class Favourites extends Fragment {
             }
         });
     }
-    public void populateListWithItems(View view, List favourites, String[] name, String[] availability, String[] email, String[] department, String[] description, String[] title, Long [] avatarVersion, String [] location){
+    public void populateListWithItems(View view, List favourites, String[] name, String[] availability, String[] email, String[] department, String[] description, String[] title, Long [] avatarVersion, String [] location, String [] campus){
         LinearLayout singleTutorLayout = (LinearLayout) view.findViewById(R.id.singleTutor) ;
 
         ListAdapterSearch lAdapter;
@@ -179,15 +181,21 @@ public class Favourites extends Fragment {
                 StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Avatars/"+email[i]+".jpg");
                 GlideApp.with(view).load(storageReference).signature(new ObjectKey(email[i]+avatarVersion[i])).placeholder(R.drawable.baseline_person_24).into(SingleTutorAvatar);
 
-                if (availability[i].equals("Available"))
+                if (availability[i].equals("Available")) {
                     SingleTutorAvailabilityImage.setImageResource(R.drawable.baseline_event_available_24);
-                else if (availability[i].equals("Tentative"))
+                    SingleTutorAvailabilityText.setText(availability[i]+" at: "+location[i]+" on "+campus[i]+" Campus");
+                }
+                else if (availability[i].equals("Tentative")) {
                     SingleTutorAvailabilityImage.setImageResource(R.drawable.baseline_event_24);
-                else
+                    SingleTutorAvailabilityText.setText(availability[i]+" at: "+location[i]+" on "+campus[i]+" Campus");
+                }
+                else {
                     SingleTutorAvailabilityImage.setImageResource(R.drawable.baseline_event_busy_24);
+                    SingleTutorAvailabilityText.setText(availability[i]);
+                }
 
                 SingleTutorName.setText(name[i]);
-                SingleTutorAvailabilityText.setText(availability[i]+" at: "+location[i]);
+
                 SingleTutorTitle.setText(title[i]);
                 SingleTutorDepartment.setText(department[i]);
                 SingleTutorDescription.setText(description[i]);
@@ -226,7 +234,7 @@ public class Favourites extends Fragment {
                                 ((TutorNavigationActivity) getActivity()).switchToMazeMap();
                             else
                                 ((StudentNavigationActivity) getActivity()).switchToMazeMap();
-                            frag.changeUrl(location[i]);
+                            frag.changeUrl(location[i], campus[i]);
                         }
                     });
                 }

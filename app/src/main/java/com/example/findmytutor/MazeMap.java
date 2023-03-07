@@ -86,8 +86,14 @@ public class MazeMap extends Fragment {
             myWebView.loadUrl("https://use.mazemap.com/#v=1&center=-1.185719,52.911951&zoom=15.4&campusid=745");
         return view;
     }
-    public void changeUrl(String location){
+    public void changeUrl(String location, String campus){
         Toast.makeText(getActivity(), location, Toast.LENGTH_SHORT).show();
-        myWebView.loadUrl("https://use.mazemap.com/?campusid=745&search="+location);
+        int campusId = 0;
+        if (campus.equals("City")) campusId = 640;
+        else if (campus.equals("Clifton")) campusId = 745;
+        else if (campus.equals("Brackenhurst")) campusId = 761;
+        else if (campus.equals("Creative Quarter")) campusId = 786;
+        else if (campus.equals("Mansfield")) campusId = 787;
+        myWebView.loadUrl("https://use.mazemap.com/?campusid="+campusId+"&search="+location);
     }
 }
