@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.bumptech.glide.signature.ObjectKey;
@@ -115,17 +116,15 @@ public class Availability extends Fragment {
         EditText department = (EditText) view.findViewById(R.id.editTextDepartment);
         EditText description = (EditText) view.findViewById(R.id.editTextDescription);
         EditText location = (EditText) view.findViewById(R.id.editTextLocation);
-        EditText time = (EditText) view.findViewById(R.id.editTextEndAfter);
         ImageView imageUpload = (ImageView) view.findViewById(R.id.imageViewAvatar);
         Spinner dropdown = (Spinner) view.findViewById(R.id.spinner);
+        TimePicker timePicker = (TimePicker) view.findViewById(R.id.datePicker1);
 
         LinearLayout locationLayout = (LinearLayout) view.findViewById(R.id.locationLayout);
         LinearLayout timeLayout = (LinearLayout) view.findViewById(R.id.timeLayout);
         BottomNavigationView bottomNavigationView = (BottomNavigationView) view.findViewById(R.id.availability_navigation);
         TextView titleTextView = (TextView) getActivity().findViewById(R.id.TitleTextView);
         Email = bundle.getString("email");
-
-        SimpleDateFormat fullDateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
 
         String[] items = new String[]{"City", "Clifton", "Brackenhurst", "Creative Quarter", "Mansfield"};
 
@@ -188,21 +187,17 @@ public class Availability extends Fragment {
                     avatarVersion = document.getLong("avatarVersion");
                     if (!document.getString("campus").isEmpty())dropdown.setSelection(adapter.getPosition(document.getString("campus")));
                     GlideApp.with(getActivity()).load(storageReference).signature(new ObjectKey(Email + avatarVersion)).placeholder(R.drawable.baseline_perm_contact_calendar_24).into(imageUpload);
-                    try {
-                        if (Availability.equals("Busy")) {
-                            bottomNavigationView.setSelectedItemId(R.id.Busy);
-                            time.setText(fullDateFormat.format(new Timestamp(System.currentTimeMillis())));
-                        }
-                        else if (Availability.equals("Tentative")) {
-                            bottomNavigationView.setSelectedItemId(R.id.Tentative);
-                            time.setText(fullDateFormat.format(document.getDate("time")));
-                        }
-                        else
-                            time.setText(fullDateFormat.format(document.getDate("time")));
-                    } catch (Exception e) {
-                        time.setText(fullDateFormat.format(new Timestamp(System.currentTimeMillis())));
-                    }
+                    timePicker.setHour(document.getDate("time").getHours());
+                    timePicker.setMinute(document.getDate("time").getMinutes());
 
+                    if (Availability.equals("Busy")) {
+                        bottomNavigationView.setSelectedItemId(R.id.Busy);
+                    }
+                    else if (Availability.equals("Tentative")) {
+                        bottomNavigationView.setSelectedItemId(R.id.Tentative);
+                    }
+                    else
+                        bottomNavigationView.setSelectedItemId(R.id.Availability);
                 }
             }
         });
@@ -213,7 +208,7 @@ public class Availability extends Fragment {
             @Override
             public void onClick(View v)
             {
-                if ((Availability.equals("Available") || Availability.equals("Tentative"))&&(title.getText().toString().isEmpty() || department.getText().toString().isEmpty() || description.getText().toString().isEmpty() || location.getText().toString().isEmpty() || time.getText().toString().isEmpty()))
+                if ((Availability.equals("Available") || Availability.equals("Tentative"))&&(title.getText().toString().isEmpty() || department.getText().toString().isEmpty() || description.getText().toString().isEmpty() || location.getText().toString().isEmpty()))
                     Toast.makeText(getActivity(), "Missing fields!", Toast.LENGTH_SHORT).show();
                 else if (Availability.equals("Busy")&&(title.getText().toString().isEmpty() || department.getText().toString().isEmpty() || description.getText().toString().isEmpty()))
                     Toast.makeText(getActivity(), "Missing fields!", Toast.LENGTH_SHORT).show();
@@ -237,17 +232,13 @@ public class Availability extends Fragment {
                                 tutor.put("description", description.getText().toString());
                                 tutor.put("availability", Availability);
                                 tutor.put("campus", Campus);
-                                if (Availability.equals("Busy")) {
-                                    tutor.put("location", "");
-                                    tutor.put("time", new Timestamp(System.currentTimeMillis()));
-                                } else {
-                                    try {
-                                        Date date = fullDateFormat.parse(time.getText().toString());
-                                        tutor.put("time", date);
-                                    } catch (ParseException e) {
-                                    }
+                                if (!Availability.equals("Busy")) {
+                                    Date date = new Date();
+                                    date.setHours(timePicker.getHour());
+                                    date.setMinutes(timePicker.getMinute());
+                                    date.setSeconds(0);
+                                    tutor.put("time", date);
                                     tutor.put("location", location.getText().toString());
-
                                 }
 
                                 docRef.update(tutor);

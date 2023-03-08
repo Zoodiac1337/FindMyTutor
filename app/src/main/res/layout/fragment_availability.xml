@@ -32,8 +32,8 @@
                 android:src="@drawable/baseline_perm_contact_calendar_24" />
 
 
-
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
@@ -175,13 +175,29 @@
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/textView4"
+                <LinearLayout
+                    android:id="@+id/locationLayout3"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="310000"
-                    android:gravity="bottom"
-                    android:text="Location" />
+                    android:layout_height="50dp"
+                    android:layout_weight="100000">
+
+                    <TextView
+                        android:id="@+id/textView4"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="bottom"
+                        android:text="Location" />
+
+                    <TextView
+                        android:id="@+id/textView8"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="bottom"
+                        android:text="Campus" />
+                </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/locationLayout2"
                     android:layout_width="match_parent"
@@ -197,12 +213,13 @@
                         android:gravity="top"
                         android:hint="Location"
                         android:inputType="textPersonName" />
+
                     <Spinner
                         android:id="@+id/spinner"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_weight="1"
                         android:layout_gravity="center"
+                        android:layout_weight="1"
                         android:spinnerMode="dropdown" />
                 </LinearLayout>
             </LinearLayout>
@@ -213,7 +230,7 @@
             android:id="@+id/timeLayout"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_weight="2"
+            android:layout_weight="10"
             android:orientation="horizontal">
 
             <ImageView
@@ -233,19 +250,16 @@
                     android:id="@+id/textView5"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="5"
+                    android:layout_weight="9"
                     android:gravity="bottom"
                     android:text="Change to busy after" />
 
-                <EditText
-                    android:id="@+id/editTextEndAfter"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="3"
-                    android:ems="10"
-                    android:gravity="top"
-                    android:hint="Change to busy after"
-                    android:inputType="textPersonName" />
+                <TimePicker
+                    android:id="@+id/datePicker1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:timePickerMode="spinner" />
             </LinearLayout>
 
         </LinearLayout>

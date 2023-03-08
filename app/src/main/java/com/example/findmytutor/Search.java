@@ -132,13 +132,13 @@ public class Search extends Fragment {
                         avatarVersion[i] = document.getLong("avatarVersion");
                         location[i] = document.getString("location");
                         campus[i] = document.getString("campus");
+                        availability[i] = document.getString("availability");
 
-                        DocumentReference docRef = FirebaseFirestore.getInstance().collection("Tutor").document(email[i]);
-                        if (new Date().after(document.getDate("time"))) {
+                        DocumentReference docRef = db.collection("Tutor").document(email[i]);
+                        if (!(availability[i].equals("Busy")) && new Date().after(document.getDate("time"))) {
                             docRef.update("availability", "Busy");
                             availability[i] = "Busy";
                         }
-                        else availability[i] = document.getString("availability");
                         i++;
                     }
                     populateListWithItems(view, name, availability, email, department, description, title, avatarVersion, location, campus);
