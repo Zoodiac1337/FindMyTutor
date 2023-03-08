@@ -78,7 +78,6 @@ public class ListAdapterSearch extends BaseAdapter {
             result=convertView;
         }
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
         viewHolder.txtName.setText(name[position]);
 //        viewHolder.imageAvatar.setImageResource(R.drawable.baseline_person_24);

@@ -19,6 +19,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +71,7 @@ public class RegisterActivity extends AppCompatActivity {
         user.put("department", "");
         user.put("description", "");
         user.put("location", "");
-        user.put("time", "");
+        user.put("time", new Date());
         user.put("title", "");
         user.put("campus","");
         String type = "";

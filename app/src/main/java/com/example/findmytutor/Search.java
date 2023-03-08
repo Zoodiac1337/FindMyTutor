@@ -26,6 +26,7 @@ import com.bumptech.glide.signature.ObjectKey;
 import com.example.findmytutor.ListAdapters.ListAdapterSearch;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -34,6 +35,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -123,7 +125,6 @@ public class Search extends Fragment {
                     int i = 0;
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         name[i] = (document.getString("lastName") + ", " + document.getString("firstName"));
-                        availability[i] = document.getString("availability");
                         email[i] = document.getId();
                         department[i] = document.getString("department");
                         description[i] = document.getString("description");
@@ -131,6 +132,13 @@ public class Search extends Fragment {
                         avatarVersion[i] = document.getLong("avatarVersion");
                         location[i] = document.getString("location");
                         campus[i] = document.getString("campus");
+
+                        DocumentReference docRef = FirebaseFirestore.getInstance().collection("Tutor").document(email[i]);
+                        if (new Date().after(document.getDate("time"))) {
+                            docRef.update("availability", "Busy");
+                            availability[i] = "Busy";
+                        }
+                        else availability[i] = document.getString("availability");
                         i++;
                     }
                     populateListWithItems(view, name, availability, email, department, description, title, avatarVersion, location, campus);

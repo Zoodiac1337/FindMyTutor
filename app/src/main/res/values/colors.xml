@@ -12,4 +12,12 @@
     <color name="light_blue_A200">#FF40C4FF</color>
     <color name="light_blue_A400">#FF00B0FF</color>
     <color name="black_overlay">#66000000</color>
+
+    <color name="icons_gray">#FF49454F</color>
+    <color name="tentative">#cc9f00</color>
+    <color name="available">#0c9200</color>
+    <color name="busy">#d20202</color>
+    <color name="background_purple">#6750A4</color>
+
+
 </resources>

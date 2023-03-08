@@ -125,7 +125,8 @@ public class Availability extends Fragment {
         TextView titleTextView = (TextView) getActivity().findViewById(R.id.TitleTextView);
         Email = bundle.getString("email");
 
-        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+        SimpleDateFormat fullDateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+
         String[] items = new String[]{"City", "Clifton", "Brackenhurst", "Creative Quarter", "Mansfield"};
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, items);
@@ -144,7 +145,6 @@ public class Availability extends Fragment {
         });
 
         StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Avatars/"+Email+".jpg");
-
         bottomNavigationView.setOnItemSelectedListener(
                 new NavigationBarView.OnItemSelectedListener() {
                     @Override
@@ -179,6 +179,7 @@ public class Availability extends Fragment {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
+                    Availability = document.getString("availability");
                     title.setText(document.getString("title"));
                     department.setText(document.getString("department"));
                     description.setText(document.getString("description"));
@@ -188,9 +189,18 @@ public class Availability extends Fragment {
                     if (!document.getString("campus").isEmpty())dropdown.setSelection(adapter.getPosition(document.getString("campus")));
                     GlideApp.with(getActivity()).load(storageReference).signature(new ObjectKey(Email + avatarVersion)).placeholder(R.drawable.baseline_perm_contact_calendar_24).into(imageUpload);
                     try {
-                        time.setText(document.getDate("time").toString());
+                        if (Availability.equals("Busy")) {
+                            bottomNavigationView.setSelectedItemId(R.id.Busy);
+                            time.setText(fullDateFormat.format(new Timestamp(System.currentTimeMillis())));
+                        }
+                        else if (Availability.equals("Tentative")) {
+                            bottomNavigationView.setSelectedItemId(R.id.Tentative);
+                            time.setText(fullDateFormat.format(document.getDate("time")));
+                        }
+                        else
+                            time.setText(fullDateFormat.format(document.getDate("time")));
                     } catch (Exception e) {
-                        time.setText(sdf.format(new Timestamp(System.currentTimeMillis())));
+                        time.setText(fullDateFormat.format(new Timestamp(System.currentTimeMillis())));
                     }
 
                 }
@@ -232,7 +242,7 @@ public class Availability extends Fragment {
                                     tutor.put("time", new Timestamp(System.currentTimeMillis()));
                                 } else {
                                     try {
-                                        Date date = sdf.parse(time.getText().toString());
+                                        Date date = fullDateFormat.parse(time.getText().toString());
                                         tutor.put("time", date);
                                     } catch (ParseException e) {
                                     }
