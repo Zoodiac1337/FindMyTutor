@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -83,21 +84,29 @@ public class StudentNavigationActivity extends AppCompatActivity {
             if (screen == 1) {
                 ListView searchListView = (ListView) this.findViewById(R.id.favouritesList);
                 LinearLayout singleTutorLayout = (LinearLayout) this.findViewById(R.id.singleTutor);
+                SwipeRefreshLayout pullToRefresh = (SwipeRefreshLayout) this.findViewById(R.id.swiperefresh);
                 if (singleTutorLayout.getVisibility() == View.VISIBLE) {
                     singleTutorLayout.setVisibility(View.GONE);
                     searchListView.setVisibility(View.VISIBLE);
+                    pullToRefresh.setVisibility(View.VISIBLE);
                 }
-            }
-            else if (screen == 2) {
-//            fragmentManager.beginTransaction().detach(MazeMap).commit();
-//            fragmentManager.beginTransaction().attach(MazeMap).commit();
+                else {
+                    fragmentManager.beginTransaction().detach(Favourites).commit();
+                    fragmentManager.beginTransaction().attach(Favourites).commit();
+                }
             }
             else if (screen == 3) {
                 ListView searchListView = (ListView) this.findViewById(R.id.searchList);
                 LinearLayout singleTutorLayout = (LinearLayout) this.findViewById(R.id.singleTutor);
+                SwipeRefreshLayout pullToRefresh = (SwipeRefreshLayout) this.findViewById(R.id.swiperefresh);
                 if (singleTutorLayout.getVisibility() == View.VISIBLE) {
                     singleTutorLayout.setVisibility(View.GONE);
                     searchListView.setVisibility(View.VISIBLE);
+                    pullToRefresh.setVisibility(View.VISIBLE);
+                }
+                else {
+                    fragmentManager.beginTransaction().detach(Search).commit();
+                    fragmentManager.beginTransaction().attach(Search).commit();
                 }
             }
     }

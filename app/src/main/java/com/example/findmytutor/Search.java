@@ -9,6 +9,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -165,7 +166,18 @@ public class Search extends Fragment {
         TextView SingleTutorDescription = (TextView) view.findViewById(R.id.singleTutorDescription);
         ImageView SingleTutorAvatar = (ImageView) view.findViewById(R.id.singleTutorAvatar);
         ImageView SingleTutorAvailabilityImage = (ImageView) view.findViewById(R.id.singleTutorAvailabilityImage);
+        SwipeRefreshLayout pullToRefresh = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
 
+        pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (type.equals("Tutor"))
+                    ((TutorNavigationActivity) getActivity()).onBackPressed();
+                else
+                    ((StudentNavigationActivity) getActivity()).onBackPressed();
+                pullToRefresh.setRefreshing(false);
+            }
+        });
 
         searchListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -193,6 +205,7 @@ public class Search extends Fragment {
 
                 searchListView.setVisibility(View.GONE);
                 singleTutorLayout.setVisibility(View.VISIBLE);
+                pullToRefresh.setVisibility(View.GONE);
 
                 getFavourites(view, email[i]);
 

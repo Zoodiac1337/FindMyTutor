@@ -87,7 +87,6 @@ public class MazeMap extends Fragment {
         return view;
     }
     public void changeUrl(String location, String campus){
-        Toast.makeText(getActivity(), location, Toast.LENGTH_SHORT).show();
         int campusId = 0;
         if (campus.equals("City")) campusId = 640;
         else if (campus.equals("Clifton")) campusId = 745;
